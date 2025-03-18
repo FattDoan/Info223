@@ -12,13 +12,12 @@ public class TP6 extends PApplet {
 
     int LAB_SIZE = 21;
     int BOX_SIZE = 40;
-    int windowWidth = 1600, windowHeight = 900;
     char labyrinthe[][];
     char sides[][][];
     PShape floor;
 
     public void settings() {
-        size(windowWidth, windowHeight, P3D);
+        size(1600, 900, P3D);
     }
 
     public void setup() {
@@ -95,8 +94,27 @@ public class TP6 extends PApplet {
         floor.vertex(BOX_SIZE, BOX_SIZE,0);
         floor.vertex(0, BOX_SIZE,0);
         floor.endShape(CLOSE);
-    }
     
+
+    }
+    void drawAxes(float len) {
+      strokeWeight(3);
+      
+      // X-Axis (Red)
+      stroke(255, 0, 0);
+      line(0, 0, 0, len, 0, 0);
+      
+      // Y-Axis (Green)
+      stroke(0, 255, 0);
+      line(0, 0, 0, 0, len, 0);
+      
+      // Z-Axis (Blue)
+      stroke(0, 0, 255);
+      line(0, 0, 0, 0, 0, len);
+    
+      stroke(0,0,0);
+    }
+ 
     public void drawBox(int i, int j, int level) {
         beginShape(QUADS);
         // top
@@ -153,44 +171,78 @@ public class TP6 extends PApplet {
     float playerHeight = BOX_SIZE;
     // In 3D, z is y in 2D
     // 2D (x,y) -> 3D (x, height, y)
-    PVector camPos = new PVector(BOX_SIZE + BOX_SIZE/2, playerHeight, -5);
-    PVector cursor =  new PVector(camPos.x, playerHeight, -camPos.z - BOX_SIZE/2);
-    float sensitivity = 0.5f;
+    PVector camPos = new PVector(BOX_SIZE + BOX_SIZE/2, playerHeight, 0);
+    //PVector cursor =  new PVector(camPos.x, playerHeight, camPos.z + 1);
+    PVector lookDir = new PVector(0, 0, 1); // Forward
+    float yaw = 0, pitch = 0;
+    float sensitivity = 0.0005f;
+    float speed = 3.0f;
 
     public boolean checkIfWallCollision(float x, float y) {
         int xI = (int) Math.floor(x), yI = (int) Math.floor(y);
         int i = xI % BOX_SIZE, j = yI % BOX_SIZE;
         return labyrinthe[i][j] == '#';
     }
+    float a = 0;
     public void draw() {
-        camera(camPos.x, camPos.y, camPos.z, cursor.x, cursor.y, cursor.z, 0, -1, 0);
-        perspective(PI/2.5f, (float)windowWidth/windowHeight, 1, 3000);
+        background(220);
+
+        PVector deltaMouseMovement = new PVector(mouseX - pmouseX, mouseY - pmouseY);
+        yaw += deltaMouseMovement.x * sensitivity;
+        pitch += deltaMouseMovement.y * sensitivity;
+        pitch = constrain(pitch, -PI/2 + 0.1f, PI/2 - 0.1f);
+
+        lookDir.x = cos(yaw) * cos(pitch);
+        lookDir.y = sin(pitch);
+        lookDir.z = sin(yaw) * cos(pitch);
+
+        PVector camTarget = PVector.add(camPos, lookDir);
+        camera(camPos.x, camPos.y, camPos.z, camTarget.x, camTarget.y, camTarget.z, 0, -1, 0);
+        perspective(PI/2.5f, (float)this.width/this.height, 1, 3000);
+        //translate(width/2, height/2, 0);
+        //rotateX(frameCount * 0.01f);
+        //rotateY(frameCount * 0.01f);
+        //rotateZ(-PI/2);
+        //rotateY(a);
+
+        //scale(0.4f, 0.4f, 0.4f);
+        pushMatrix();
+        scale(1, 1, -1);
         for (int i = 0; i < LAB_SIZE; i++) {
             for (int j = 0; j < LAB_SIZE; j++) {
                 pushMatrix();
                 rotateX(-PI/2);
-                //scale(1,1,-1);
+                translate(j*BOX_SIZE, i*BOX_SIZE);
                 //rotateZ(PI/2);
                 if (labyrinthe[i][j] == '#') {
-                    translate(j*BOX_SIZE, i*BOX_SIZE);
                     drawBox(i,j,1);
                     drawBox(i,j,2);
                 }
                 else {
-                    translate(j*BOX_SIZE, i*BOX_SIZE);
                     shape(floor);
                 }
                 popMatrix();
             }
         }
+        popMatrix();
 
-        //PVector deltaMouseMovement = new PVector(mouseX - pmouseX, mouseY - pmouseY);
-        //cursor.x += deltaMouseMovement.x * sensitivity; cursor.z += deltaMouseMovement.y * sensitivity;
+        mouseX = width/2;
+        mouseY = height/2;
+                //drawAxes(300);
+        //cursor.x += deltaMouseMovement.x * sensitivity; cursor.y += deltaMouseMovement.y * sensitivity;
         //cursor.x += 0.5f;
     }
     public void keyPressed() {
-        if (keyCode == UP) {
+        PVector moveDir = new PVector(0, 0, 0);
+        if (key == 'w') moveDir.add(lookDir);
+        if (key == 's') moveDir.sub(lookDir);
+        if (key == 'a') moveDir.add(lookDir.cross(new PVector(0, 1, 0)));  // Left strafe
+        if (key == 'd') moveDir.sub(lookDir.cross(new PVector(0, 1, 0)));  // Right strafe
 
+        // Normalize direction and apply movement speed
+        if (moveDir.mag() > 0) {
+            moveDir.normalize().mult(speed);
+            camPos.add(moveDir);
         }
     }
 }
