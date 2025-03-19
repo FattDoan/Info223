@@ -16,12 +16,15 @@ public class TP6 extends PApplet {
     char sides[][][];
     PShape floor;
 
+    Camera camera;
     public void settings() {
-        size(1600, 900, P3D);
+        size(1920, 1080, P3D);
+        //fullScreen(P3D, 1);
     }
 
     public void setup() {
-        frameRate(20);
+        noCursor();
+        frameRate(60);
         randomSeed(2);
         labyrinthe = new char[LAB_SIZE][LAB_SIZE];
         sides = new char[LAB_SIZE][LAB_SIZE][4];
@@ -95,7 +98,7 @@ public class TP6 extends PApplet {
         floor.vertex(0, BOX_SIZE,0);
         floor.endShape(CLOSE);
     
-
+        camera = new Camera(this, new PVector(BOX_SIZE + BOX_SIZE/2, BOX_SIZE, 0));
     }
     void drawAxes(float len) {
       strokeWeight(3);
@@ -168,6 +171,7 @@ public class TP6 extends PApplet {
         endShape();
     }
 
+    /*
     float playerHeight = BOX_SIZE;
     // In 3D, z is y in 2D
     // 2D (x,y) -> 3D (x, height, y)
@@ -177,7 +181,7 @@ public class TP6 extends PApplet {
     float yaw = 0, pitch = 0;
     float sensitivity = 0.0005f;
     float speed = 3.0f;
-
+    */
     public boolean checkIfWallCollision(float x, float y) {
         int xI = (int) Math.floor(x), yI = (int) Math.floor(y);
         int i = xI % BOX_SIZE, j = yI % BOX_SIZE;
@@ -187,7 +191,7 @@ public class TP6 extends PApplet {
     public void draw() {
         background(220);
 
-        PVector deltaMouseMovement = new PVector(mouseX - pmouseX, mouseY - pmouseY);
+        /*PVector deltaMouseMovement = new PVector(mouseX - pmouseX, mouseY - pmouseY);
         yaw += deltaMouseMovement.x * sensitivity;
         pitch += deltaMouseMovement.y * sensitivity;
         pitch = constrain(pitch, -PI/2 + 0.1f, PI/2 - 0.1f);
@@ -198,7 +202,7 @@ public class TP6 extends PApplet {
 
         PVector camTarget = PVector.add(camPos, lookDir);
         camera(camPos.x, camPos.y, camPos.z, camTarget.x, camTarget.y, camTarget.z, 0, -1, 0);
-        perspective(PI/2.5f, (float)this.width/this.height, 1, 3000);
+        perspective(PI/2.5f, (float)this.width/this.height, 1, 3000);*/
         //translate(width/2, height/2, 0);
         //rotateX(frameCount * 0.01f);
         //rotateY(frameCount * 0.01f);
@@ -206,6 +210,7 @@ public class TP6 extends PApplet {
         //rotateY(a);
 
         //scale(0.4f, 0.4f, 0.4f);
+        camera.updateCamera();
         pushMatrix();
         scale(1, 1, -1);
         for (int i = 0; i < LAB_SIZE; i++) {
@@ -226,13 +231,14 @@ public class TP6 extends PApplet {
         }
         popMatrix();
 
-        mouseX = width/2;
-        mouseY = height/2;
+        //mouseX = width/2;
+        //mouseY = height/2;
                 //drawAxes(300);
         //cursor.x += deltaMouseMovement.x * sensitivity; cursor.y += deltaMouseMovement.y * sensitivity;
         //cursor.x += 0.5f;
     }
     public void keyPressed() {
+        /*
         PVector moveDir = new PVector(0, 0, 0);
         if (key == 'w') moveDir.add(lookDir);
         if (key == 's') moveDir.sub(lookDir);
@@ -243,6 +249,6 @@ public class TP6 extends PApplet {
         if (moveDir.mag() > 0) {
             moveDir.normalize().mult(speed);
             camPos.add(moveDir);
-        }
+        }*/
     }
 }
