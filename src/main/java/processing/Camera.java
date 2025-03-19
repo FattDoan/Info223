@@ -109,11 +109,35 @@ private void updateRotationsCurve() {
         //float deltaTime = 1.0f / context.frameRate;
         //updateRotationsLinear();
         updateRotationsCurve();
+ 
+        // Matrix rotation implementation
+/*
         RealMatrix r = Rx(PApplet.radians(this.phi)).multiply(Ry(PApplet.radians(this.theta)));
         double[] forward = {0, 0, 1};
         forward = r.operate(forward);
         PVector lookDir = new PVector((float)forward[0], (float)forward[1], (float)forward[2]); 
+*/        
+
+        // Trigonometric rotation implementation
+        // https://en.wikipedia.org/wiki/Spherical_coordinate_system
+        // https://learnopengl.com/Getting-started/Camera
+        // PVector lookDir = new PVector(
+        // PApplet.cos(PApplet.radians(this.phi)) * PApplet.cos(PApplet.radians(this.theta)),
+        //             PApplet.sin(PApplet.radians(this.phi)),
+        //             PApplet.cos(PApplet.radians(this.phi)) * PApplet.sin(PApplet.radians(this.theta)));
+        //
+        // The above formula (from OpenGL) assumes if theta = phi = 0, we're looking at [1,0,0]
+        // instead of [0,0,1] by our convention
+        //
+        // We can also try to Ry(theta) * Rx(phi) * [0,0,1] to get the same result
+        PVector lookDir = new PVector(
+            PApplet.cos(PApplet.radians(this.phi)) * PApplet.sin(PApplet.radians(this.theta)),
+            -PApplet.sin(PApplet.radians(this.phi)),
+            PApplet.cos(PApplet.radians(this.phi)) * PApplet.cos(PApplet.radians(this.theta))
+                );
+
         lookDir = lookDir.normalize();
+        System.out.println("lookDir: " + lookDir.x + " " + lookDir.y + " " + lookDir.z);
         this.target.set(this.pos.x + lookDir.x*lookDistance, 
                         this.pos.y + lookDir.y*lookDistance,
                         this.pos.z + lookDir.z*lookDistance);

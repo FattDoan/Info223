@@ -18,8 +18,8 @@ public class TP6 extends PApplet {
 
     Camera camera;
     public void settings() {
-        size(1920, 1080, P3D);
-        //fullScreen(P3D, 1);
+        //size(1920, 1080, P3D);
+        fullScreen(P3D, 1);
     }
 
     public void setup() {
