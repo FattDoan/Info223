@@ -3,6 +3,8 @@ package processing;
 import processing.core.PApplet;
 import processing.core.PShape;
 import processing.core.PVector;
+import processing.opengl.*;
+
 
 public class TP6 extends PApplet {
     public static void main(String[] args) {
@@ -18,8 +20,11 @@ public class TP6 extends PApplet {
 
     Camera camera;
     public void settings() {
-        //size(1920, 1080, P3D);
-        fullScreen(P3D, 1);
+        System.setProperty("jogl.disable.openglcore", "false");          // fix OpenGL stuff
+                                                                         // we're on Processing 3
+                                                                         // it's fixed in Processing 4
+        size(1920, 1080, P3D);
+        //fullScreen(P3D, 1);
     }
 
     public void setup() {
