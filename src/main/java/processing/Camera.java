@@ -12,8 +12,8 @@ public class Camera {
     private PVector target;     // Where we're looking directly at
     private float theta;        // yaw: left and right rotation along X axis
     private float phi;          // pitch: up and down rotation along Y axis
-    private float sensitivity = 1f;
-    private float moveSpeed = 40f;
+    private float sensitivity = 0.2f;
+    private float moveSpeed = 60f;
     private final float lookDistance = 5;
     private final PVector forwardVect = new PVector(0, 0, 1); // for Z movement
     private final PVector rightVect = new PVector(1, 0, 0); // for X movement
@@ -61,6 +61,11 @@ public class Camera {
 
         forwardVect.set(lookDir.x, 0, lookDir.z);
         PVector.cross(forwardVect, new PVector(0, -1, 0), rightVect);
+        
+        // preventing when looking straight up or down, we can't move
+        forwardVect.normalize();    
+        rightVect.normalize();      
+
         updateOnKeyPressed();
 
         this.target.set(this.pos.x + lookDir.x*lookDistance, 
@@ -80,24 +85,23 @@ public class Camera {
         float camSpeed = moveSpeed * deltaTime;
         // Forward
         if (KeyInput.goForward()) {
-            moveDir.add(PVector.mult(forwardVect, camSpeed));
+            moveDir.add(PVector.mult(forwardVect, 1));
         }
         // Backward
         if (KeyInput.goBackward()) {
-            moveDir.add(PVector.mult(forwardVect, -camSpeed));
+            moveDir.add(PVector.mult(forwardVect, -1));
         }
         // Left
         if (KeyInput.goLeft()) { 
-            moveDir.add(PVector.mult(rightVect, -camSpeed));
+            moveDir.add(PVector.mult(rightVect, -1));
         }
         // Right
         if (KeyInput.goRight()) {
-            moveDir.add(PVector.mult(rightVect, camSpeed));
+            moveDir.add(PVector.mult(rightVect, 1));
         }
         if (moveDir.mag() > 0) {
-            if (moveDir.mag() > moveSpeed) {
-                moveDir.normalize().mult(camSpeed);
-            }
+            moveDir.normalize();
+            moveDir.mult(camSpeed);
             this.pos.add(moveDir);
         }
     }
