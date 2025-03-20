@@ -3,14 +3,11 @@ package processing;
 import processing.core.PApplet;
 import processing.core.PShape;
 import processing.core.PVector;
-import processing.opengl.*;
-
 
 public class TP6 extends PApplet {
     public static void main(String[] args) {
         PApplet.main("processing.TP6");
     }
-
 
     int LAB_SIZE = 21;
     int BOX_SIZE = 40;
@@ -29,6 +26,7 @@ public class TP6 extends PApplet {
 
     public void setup() {
         noCursor();
+        lights();
         frameRate(60);
         randomSeed(2);
         labyrinthe = new char[LAB_SIZE][LAB_SIZE];
@@ -242,18 +240,12 @@ public class TP6 extends PApplet {
         //cursor.x += deltaMouseMovement.x * sensitivity; cursor.y += deltaMouseMovement.y * sensitivity;
         //cursor.x += 0.5f;
     }
+    
     public void keyPressed() {
-        /*
-        PVector moveDir = new PVector(0, 0, 0);
-        if (key == 'w') moveDir.add(lookDir);
-        if (key == 's') moveDir.sub(lookDir);
-        if (key == 'a') moveDir.add(lookDir.cross(new PVector(0, 1, 0)));  // Left strafe
-        if (key == 'd') moveDir.sub(lookDir.cross(new PVector(0, 1, 0)));  // Right strafe
-
-        // Normalize direction and apply movement speed
-        if (moveDir.mag() > 0) {
-            moveDir.normalize().mult(speed);
-            camPos.add(moveDir);
-        }*/
+        KeyInput.updateOnKeyPressed(this);
     }
-}
+    public void keyReleased() {
+        KeyInput.updateOnKeyReleased(this);
+        //System.out.println("Key released :" + keyCode);
+    }
+} 
