@@ -33,11 +33,6 @@
         <version>2.3.2</version>
     </dependency>
 
-    <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-math3</artifactId>
-        <version>3.6.1</version>
-    </dependency>  
   </dependencies>
 
   <build>
@@ -47,7 +42,7 @@
             <artifactId>exec-maven-plugin</artifactId>
             <version>3.5.0</version>
             <configuration>
-                <mainClass>processing.TP6</mainClass>
+                <mainClass>processing.Main</mainClass>
             </configuration>
         </plugin>
 

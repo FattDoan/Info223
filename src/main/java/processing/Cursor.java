@@ -12,7 +12,7 @@ public class Cursor {
 
     private PVector accumulatedMovement = new PVector(0, 0);
     private PVector previousMovement = new PVector(0, 0);
-    private float dampingFactor = 0.6f; // Higher values = less damping
+    private final float dampingFactor = 0.6f; // Higher values = less damping
     private boolean isFirstUpdate = true; 
     
     public Cursor(PApplet context) {
@@ -29,6 +29,17 @@ public class Cursor {
     private PVector mouseDelta() {
         return new PVector(context.mouseX - centerCursorX, context.mouseY - centerCursorY);
         // if -pmouseX -pmouseY doesn't work, still dont know why. It should be the same
+    }
+    private void setCursorCenterScreen() {
+        window.warpPointer(centerCursorX, centerCursorY);
+    }
+    public void updateCursorMovementLinear() {
+        PVector currentMovement = mouseDelta().copy();
+        // Apply a dead zone to filter out tiny movements
+        if (Math.abs(currentMovement.x) < 1.0f) currentMovement.x = 0;
+        if (Math.abs(currentMovement.y) < 1.0f) currentMovement.y = 0;
+        accumulatedMovement = currentMovement.copy();
+        setCursorCenterScreen();
     }
     public void updateCursorMovement() {
         PVector currentMovement = mouseDelta().copy();
@@ -68,7 +79,7 @@ public class Cursor {
         // Store for next frame
         previousMovement = currentMovement.copy();
  
-        window.warpPointer(centerCursorX, centerCursorY);
+        setCursorCenterScreen();
     }
     public PVector getCursorMovement() {
         updateCursorMovement();

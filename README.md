@@ -2,7 +2,13 @@
 
 > Ce README n'est pas un rapport. Il sert simplement de note de synthèse pour le développement mais il sera la partie principale du rapport qui sera au format **PDF** en français.
 
+**TODO:** Performance optimization. If not shaders and lighting will **FUCK** the frame rate so badly.
 
++ near O(1): collision dectection
+
++ raycasting for reducing nb of vertices rendered
+
++ More possible ways to optimize the PShape rendering
 
 ## Build system
 
@@ -47,29 +53,3 @@ Then run
 ```bash
 mvn exec:java
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

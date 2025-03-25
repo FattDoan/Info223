@@ -12,8 +12,8 @@ public class Camera {
     private PVector target;     // Where we're looking directly at
     private float theta;        // yaw: left and right rotation along X axis
     private float phi;          // pitch: up and down rotation along Y axis
-    private float sensitivity = 0.2f;
-    private float moveSpeed = 60f;
+    private float sensitivity;
+    private float moveSpeed;
     private final float lookDistance = 5;
     private final PVector forwardVect = new PVector(0, 0, 1); // for Z movement
     private final PVector rightVect = new PVector(1, 0, 0); // for X movement
@@ -21,12 +21,15 @@ public class Camera {
     private int lastFrame = 0;
     private float deltaTime = 0;
 
-    public Camera(PApplet context, PVector startingPos) {
+    public Camera(PApplet context, PVector startingPos, float sensitivity, float moveSpeed) {
         this.context = context;
+        this.sensitivity = sensitivity;
+        this.moveSpeed = moveSpeed;
         this.pos = startingPos.copy();
         this.target = startingPos.copy(); this.target.z += lookDistance;
         this.theta = this.phi = 0;     // look straight ahead          
         this.cursor = new Cursor(context);
+    
     }
     public void setSensitivity(float sensitivity) {
         this.sensitivity = sensitivity;
@@ -35,8 +38,7 @@ public class Camera {
         return this.sensitivity;
     }
 
-    public void updateCamera() {
-        System.out.println(context.frameRate);
+    public void updateCamera() { 
         PVector cursorMovement = cursor.getCursorMovement().copy();
         // Apply to rotation with reduced sensitivity
         this.theta += cursorMovement.x * (sensitivity * 0.5f);
@@ -98,6 +100,12 @@ public class Camera {
         // Right
         if (KeyInput.goRight()) {
             moveDir.add(PVector.mult(rightVect, 1));
+        }
+        if (KeyInput.flyUp()) {
+            moveDir.add(new PVector(0, 1, 0));
+        }
+        if (KeyInput.flyDown()) {
+            moveDir.add(new PVector(0, -1, 0));
         }
         if (moveDir.mag() > 0) {
             moveDir.normalize();
