@@ -14,10 +14,15 @@ public class Camera {
     private float phi;          // pitch: up and down rotation along Y axis
     private float sensitivity;
     private float moveSpeed;
+    
     private final float lookDistance = 5;
     private final PVector forwardVect = new PVector(0, 0, 1); // for Z movement
     private final PVector rightVect = new PVector(1, 0, 0); // for X movement
-    
+    public final float fovY = PApplet.PI/2f;
+    public final float aspect;    
+    public final float zNear = 1;
+    public final float zFar = 500;
+
     private int lastFrame = 0;
     private float deltaTime = 0;
 
@@ -29,7 +34,10 @@ public class Camera {
         this.target = startingPos.copy(); this.target.z += lookDistance;
         this.theta = this.phi = 0;     // look straight ahead          
         this.cursor = new Cursor(context);
-    
+        this.aspect = (float)context.width / context.height;
+    }
+    public PVector getPos() {
+        return this.pos;
     }
     public void setSensitivity(float sensitivity) {
         this.sensitivity = sensitivity;
@@ -77,7 +85,7 @@ public class Camera {
         context.camera(this.pos.x, this.pos.y, this.pos.z, 
                        this.target.x, this.target.y, this.target.z, 
                        0, -1, 0);
-        context.perspective(PApplet.PI/2f, (float)context.width/context.height, 1, 3000);
+        context.perspective(fovY, aspect, zNear, zFar);
     }
     public void updateOnKeyPressed() {
         PVector moveDir = new PVector(0, 0, 0);

@@ -16,7 +16,9 @@ public class Pyramid {
         generatePyramid();
     }
     public void generatePyramid() {
-        int nbMazes = (pyramidSize - 1) / 2;
+        
+        //int nbMazes = (pyramidSize - 1) / 2;
+        int nbMazes = 0;
         boolean flag = false;
         for (int i = 0; i <= nbMazes; i++) {
             if (i > nbMazes/2) {

@@ -44,9 +44,15 @@ public class Main extends PApplet {
     
     public void draw() {
         background(220);
-        System.out.println(frameRate);
+        System.out.println("FPS: " + frameRate);
+        int totalProcesses = (int) ProcessHandle.allProcesses().count();
+        writer.addTotalGPUDrawCalls(-reader.getTotalGPUDrawCalls());
         camera.updateCamera();
         pyramid.render();
+    
+
+        System.out.print("Total CPU Processes: " + totalProcesses + "  --->   ");
+        System.out.println("Total GPU Draw Calls: " + reader.getTotalGPUDrawCalls());
     }
     
     public void keyPressed() {

@@ -8,6 +8,7 @@ import processing.core.PShape;
 // in left-handed coord system
 // (x, y, z) is top-left coord, the height and width is Cell.SIZE
 abstract class Cell {
+    protected final Configs.ConfigsWriter writer = Configs.getWriter();
     protected final PVector coord;
     protected final Maze maze;        // reference to the maze
                                     // with this dont need to store the size of cell in Cell class
@@ -63,6 +64,7 @@ class EmptyCell extends Cell {
         context.shape(ShapeManager.getShape("square4"));
         context.shape(ShapeManager.getShape("square5"));
         context.popMatrix(); 
+        writer.addTotalGPUDrawCalls(6);
     }
 
     @Override
@@ -81,6 +83,7 @@ class PathCell extends Cell {
         context.translate(getX(), getY(), getZ());
         context.shape(ShapeManager.getShape("square4"));
         context.popMatrix(); 
+        writer.addTotalGPUDrawCalls(1);
     }
 
     @Override
@@ -110,6 +113,7 @@ class WallCell extends Cell {
             context.translate(getX(), getY(), getZ()); 
             context.shape(s);
             context.popMatrix();
+            writer.addTotalGPUDrawCalls(1);
         }
         // right
         if (j+1 == maze.getMazeSize() || !maze.getCell(i,j+1).isWall())
@@ -123,6 +127,7 @@ class WallCell extends Cell {
             context.translate(getX(), getY(), getZ());
             context.shape(s);
             context.popMatrix();
+            writer.addTotalGPUDrawCalls(1);
         }
         // bottom
         if (i+1 == maze.getMazeSize() || !maze.getCell(i+1,j).isWall())
@@ -136,6 +141,7 @@ class WallCell extends Cell {
             context.translate(getX(), getY(), getZ());
             context.shape(s);
             context.popMatrix();
+            writer.addTotalGPUDrawCalls(1);
         }
         // left
         if (j == 0|| !maze.getCell(i,j-1).isWall())
@@ -149,6 +155,7 @@ class WallCell extends Cell {
             context.translate(getX(), getY(), getZ());
             context.shape(s);
             context.popMatrix();            
+            writer.addTotalGPUDrawCalls(1);
         }
     }
 
@@ -193,6 +200,9 @@ class EndCell extends PathCell {
 }
 
 public class Maze {
+    private Configs.ConfigsReader reader = Configs.getReader();
+    private Configs.ConfigsWriter writer = Configs.getWriter();
+
     private PApplet context;
     private Cell[][] cells;
     private final int mazeSize;

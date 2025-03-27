@@ -21,6 +21,10 @@ public class Configs {
     private float mouseSensitivity;
     private float moveSpeed;       // pixels per second
 
+    // FOR DEBUGGING AND DEV
+    private int totalCPUProcesses = 0;
+    private int totalGPUDrawCalls = 0;
+
     private Configs() {
         // APP CONFIGS ---------------------------------------
         fullScreen = false;
@@ -47,6 +51,9 @@ public class Configs {
         float getPlayerHeight();
         float getMouseSensitivity();
         float getMoveSpeed();
+        
+        int getTotalCPUProcesses();
+        int getTotalGPUDrawCalls();
     }
     public interface ConfigsWriter {
         void setFullScreen(boolean fullScreen);
@@ -58,6 +65,8 @@ public class Configs {
         void setPlayerHeight(float playerHeight);
         void setMouseSensitivity(float mouseSensitivity);
         void setMoveSpeed(float moveSpeed);
+        void addTotalCPUProcesses(int val);
+        void addTotalGPUDrawCalls(int val);
     }
     // A LOT OF BOILERPLATES
     public static ConfigsReader getReader() {
@@ -88,6 +97,12 @@ public class Configs {
 
             @Override
             public float getMoveSpeed() { return instance.moveSpeed; }
+            
+            @Override
+            public int getTotalCPUProcesses() { return instance.totalCPUProcesses; }
+
+            @Override
+            public int getTotalGPUDrawCalls() { return instance.totalGPUDrawCalls; }
 
          };
     }
@@ -132,7 +147,12 @@ public class Configs {
 
             @Override
             public void setMoveSpeed(float moveSpeed) { instance.moveSpeed = moveSpeed; }
-
+            
+            @Override
+            public void addTotalCPUProcesses(int val) { instance.totalCPUProcesses += val; }
+            
+            @Override
+            public void addTotalGPUDrawCalls(int val) { instance.totalGPUDrawCalls += val; }
           };
     }
 }
