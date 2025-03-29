@@ -7,13 +7,37 @@ import processing.core.PShape;
 // square cell 
 // in left-handed coord system
 // (x, y, z) is top-left coord, the height and width is Cell.SIZE
-abstract class Cell {
-    protected final Configs.ConfigsWriter writer = Configs.getWriter();
+
+class AABB {
+    protected PVector center = new PVector(0,0,0);
+    protected PVector extents = new PVector(0,0,0);
+    public AABB(PVector min, PVector max) {
+        this.center = (min.copy().add(max)).mult(0.5f);
+        this.extents = max.copy().sub(this.center);;
+    }
+    public boolean isOnOrForwardPlane(Plane plane) {
+        float r = extents.x * PApplet.abs(plane.getNormal().x) + extents.y * PApplet.abs(plane.getNormal().y) + extents.z * PApplet.abs(plane.getNormal().z);
+        return -r <= plane.getSignedDistance(center);
+    }
+    public boolean isOnFrustum(Frustum frustum) {
+        for (int i = 0; i < 6; i++) {
+            if (!isOnOrForwardPlane(frustum.getPlane(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+abstract class Cell extends AABB {
     protected final PVector coord;
     protected final Maze maze;        // reference to the maze
-                                    // with this dont need to store the size of cell in Cell class
+                                     // with this dont need to store the size of cell in Cell class
     protected boolean sides[];
+    protected PShape S;
+    protected boolean shapesInitialized = false;
+
     public Cell(PVector coord, Maze maze) {
+        super(coord.copy(), coord.copy().add(new PVector(maze.getCellSize(), maze.getLevelHeight() * maze.getCellSize(), maze.getCellSize())));
         this.coord = coord.copy();
         this.maze = maze;
         this.sides = new boolean[]{false, false, false, false};
@@ -27,11 +51,17 @@ abstract class Cell {
     public void setSides(int i, boolean val) { sides[i] = val; }
     // TODO: need bounding box for collision detection
     
-    // 3D rendering
-    public abstract void render(PApplet context);
-
+    // update based on frustum
+    public void update(Frustum frustum) {
+        if (isOnFrustum(frustum)) S.setVisible(true);
+        else S.setVisible(false);
+    }
+    
     // console output for debugging
     public abstract void print();
+
+    // draw calls optimization
+    public abstract PShape initShapes(PApplet context);
 
     public boolean isEmpty() {
         return this instanceof EmptyCell;
@@ -52,19 +82,24 @@ class EmptyCell extends Cell {
     public EmptyCell(PVector coord, Maze maze) {
         super(coord, maze);
     }
-    
+   
     @Override
-    public void render(PApplet context) {
-        context.pushMatrix();
-        context.translate(getX(), getY(), getZ());
-        context.shape(ShapeManager.getShape("square0"));
-        context.shape(ShapeManager.getShape("square1"));
-        context.shape(ShapeManager.getShape("square2"));
-        context.shape(ShapeManager.getShape("square3"));
-        context.shape(ShapeManager.getShape("square4"));
-        context.shape(ShapeManager.getShape("square5"));
-        context.popMatrix(); 
-        writer.addTotalGPUDrawCalls(6);
+    public PShape initShapes(PApplet context) {
+        PShape cellShape = context.createShape(PApplet.GROUP);
+
+        float height = maze.getLevelHeight() * maze.getCellSize();
+
+        cellShape.translate(getX(), getY(), getZ());
+        cellShape.addChild(ShapeFactory.square0(getSize(), height));
+        cellShape.addChild(ShapeFactory.square1(getSize(), height));
+        cellShape.addChild(ShapeFactory.square2(getSize(), height));
+        cellShape.addChild(ShapeFactory.square3(getSize(), height));
+    
+        PShape s = ShapeFactory.square5(getSize(), getSize());
+        s.translate(0, getSize() * (maze.getLevelHeight() - 1), 0);
+        cellShape.addChild(s);
+        
+        return this.S = cellShape;
     }
 
     @Override
@@ -76,15 +111,24 @@ class PathCell extends Cell {
     public PathCell(PVector coord, Maze maze) {
         super(coord, maze);
     }
-    
+   
     @Override
-    public void render(PApplet context) {
-        context.pushMatrix();
-        context.translate(getX(), getY(), getZ());
-        context.shape(ShapeManager.getShape("square4"));
-        context.popMatrix(); 
-        writer.addTotalGPUDrawCalls(1);
-    }
+    public PShape initShapes(PApplet context) {
+        PShape cellShape = context.createShape(PApplet.GROUP);
+        cellShape.translate(getX(), getY(), getZ());
+
+        // add floor
+        PShape s4 = ShapeFactory.square4(getSize(), getSize());
+        cellShape.addChild(s4);
+
+
+        // add roof
+        PShape s5 = ShapeFactory.square5(getSize(), getSize());
+        s5.translate(0, getSize() * (maze.getLevelHeight() - 1), 0);
+        cellShape.addChild(s5);
+        
+        return this.S = cellShape;
+    } 
 
     @Override
     public void print() {
@@ -98,65 +142,55 @@ class WallCell extends Cell {
     }
     
     @Override
-    public void render(PApplet context) {
+    public PShape initShapes(PApplet context) {
         PVector idx = Maze.getCellIndex(coord, maze.getCellSize()).copy();
-        int i = (int)idx.x, j = (int)idx.y, level = (int)idx.z;
+        int i = (int)idx.x, j = (int)idx.y;
+        float height = maze.getLevelHeight() * maze.getCellSize();
+        
+        PShape cellShape = context.createShape(PApplet.GROUP);
+                
+        cellShape.translate(getX(), getY(), getZ());
+        
         // top
-        if (i == 0 || !maze.getCell(i-1,j).isWall())
-        {
-            PShape s = ShapeManager.getShape("square0");
-            s.setFill(context.color(255,255,255)); //white
+        if (i == 0 || !maze.getCell(i-1,j).isWall()) {
+            PShape s = ShapeFactory.square0(getSize(), height);
             if (sides[3]) {
                 s.setFill(context.color(255,255,0)); //yellow
             }
-            context.pushMatrix();
-            context.translate(getX(), getY(), getZ()); 
-            context.shape(s);
-            context.popMatrix();
-            writer.addTotalGPUDrawCalls(1);
+            cellShape.addChild(s);
         }
         // right
-        if (j+1 == maze.getMazeSize() || !maze.getCell(i,j+1).isWall())
-        {
-            PShape s = ShapeManager.getShape("square3");
-            s.setFill(context.color(255,255,255)); //white
+        if (j+1 == maze.getMazeSize() || !maze.getCell(i,j+1).isWall()) {
+            PShape s = ShapeFactory.square3(getSize(), height);
             if (sides[2]) {
                 s.setFill(context.color(0,255,0)); //green
             }
-            context.pushMatrix();
-            context.translate(getX(), getY(), getZ());
-            context.shape(s);
-            context.popMatrix();
-            writer.addTotalGPUDrawCalls(1);
+            cellShape.addChild(s);
         }
         // bottom
-        if (i+1 == maze.getMazeSize() || !maze.getCell(i+1,j).isWall())
-        {
-            PShape s = ShapeManager.getShape("square1");
-            s.setFill(context.color(255,255,255)); //white
+        if (i+1 == maze.getMazeSize() || !maze.getCell(i+1,j).isWall()) {
+            PShape s = ShapeFactory.square1(getSize(), height);
             if (sides[0]) {
                 s.setFill(context.color(255,0,0)); //red
             }
-            context.pushMatrix();
-            context.translate(getX(), getY(), getZ());
-            context.shape(s);
-            context.popMatrix();
-            writer.addTotalGPUDrawCalls(1);
+            cellShape.addChild(s);
         }
         // left
-        if (j == 0|| !maze.getCell(i,j-1).isWall())
-        {
-            PShape s = ShapeManager.getShape("square2");
-            s.setFill(context.color(255,255,255)); //white
+        if (j == 0|| !maze.getCell(i,j-1).isWall()) {
+            PShape s = ShapeFactory.square2(getSize(), height);
             if (sides[1]) {
                 s.setFill(context.color(0,0,255)); //blue
             }
-            context.pushMatrix();
-            context.translate(getX(), getY(), getZ());
-            context.shape(s);
-            context.popMatrix();            
-            writer.addTotalGPUDrawCalls(1);
+            cellShape.addChild(s);
         }
+        
+        // add the roof
+        PShape s = ShapeFactory.square5(getSize(), getSize());
+        s.translate(0, getSize() * (maze.getLevelHeight() - 1), 0);
+
+        cellShape.addChild(s);
+    
+        return this.S = cellShape;
     }
 
     @Override
@@ -171,10 +205,10 @@ class StartCell extends PathCell {
     }
     
     @Override
-    public void render(PApplet context) {
-        context.fill(0, 255, 0);
-        super.render(context);
-        context.fill(255, 255, 255);
+    public PShape initShapes(PApplet context) {
+        super.initShapes(context);
+        this.S.fill(0, 255, 0);
+        return this.S;
     }
     @Override
     public void print() {
@@ -188,10 +222,10 @@ class EndCell extends PathCell {
     }
     
     @Override
-    public void render(PApplet context) {
-        context.fill(0, 255, 0);
-        super.render(context);
-        context.fill(255, 255, 255);
+    public PShape initShapes(PApplet context) {
+        super.initShapes(context);
+        this.S.fill(0, 255, 0);
+        return this.S;
     }
     @Override
     public void print() {
@@ -200,21 +234,21 @@ class EndCell extends PathCell {
 }
 
 public class Maze {
-    private Configs.ConfigsReader reader = Configs.getReader();
-    private Configs.ConfigsWriter writer = Configs.getWriter();
-
     private PApplet context;
     private Cell[][] cells;
     private final int mazeSize;
     private final int cellSize;
     private final int level;
+    private final int levelHeight;
+    private PShape M;
     // level starting from 0 -> (PYRAMID_SIZE - 1)/2 -1 max
-    public Maze(int level, int mazeSize, int cellSize, PApplet context, boolean letEmpty) {
+    public Maze(int level, int mazeSize, int cellSize, int levelHeight, PApplet context, boolean letEmpty) {
         this.context = context;
         this.level = level;
         this.mazeSize = mazeSize;
         this.cellSize = cellSize;
-        
+        this.levelHeight = levelHeight;
+
         cells = new Cell[mazeSize][mazeSize];
         if (!letEmpty) {
             mazeGenerationDefault();
@@ -227,6 +261,7 @@ public class Maze {
                 }
             }
         }
+        initShape();
     }
     public int getCellSize() {
         return cellSize;
@@ -234,20 +269,23 @@ public class Maze {
     public int getMazeSize() {
         return mazeSize;
     }
+    public int getLevelHeight() {
+        return levelHeight;
+    }
     public Cell getCell(int i, int j) {
         return cells[i][j];
     }
-    public static PVector getCellCoord(int i, int j, int level, int cellSize) {
-        return new PVector((j + level) * cellSize,
-                           level * cellSize * 2,
-                           (i + level) * cellSize);
+    public static PVector getCellCoord(int i, int j, int mazeLevel, int cellSize) {
+        return new PVector((j + mazeLevel) * cellSize,
+                           mazeLevel * cellSize * 2,
+                           (i + mazeLevel) * cellSize);
     }
-    // return (i, j, level)
+
     public static PVector getCellIndex(PVector coord, int cellSize) {
-        int level = PApplet.floor(coord.y / (cellSize * 2));
-        return new PVector(coord.z / cellSize - level, 
-                           coord.x / cellSize - level,
-                           level);
+        int mazeLevel = PApplet.floor(coord.y / (cellSize * 2)); 
+        return new PVector(coord.z / cellSize - mazeLevel, 
+                           coord.x / cellSize - mazeLevel,
+                           mazeLevel);
     }
 
     public void mazeGenerationDefault() {
@@ -303,27 +341,22 @@ public class Maze {
             }
         }
     }
-    public void render() {
-        context.pushMatrix();
+
+    public PShape initShape() {
+        M = context.createShape(PApplet.GROUP);
         for (int i = 0; i < mazeSize; i++) {
             for (int j = 0; j < mazeSize; j++) {
-                cells[i][j].render(context);
-                if (cells[i][j].isWall() || cells[i][j].isEmpty()) {
-                    context.pushMatrix();
-                    context.translate(0, cellSize, 0);
-                    cells[i][j].render(context);
-                    context.popMatrix();
-                }
-
-                PVector coord = cells[i][j].getCoord().copy();
-                context.pushMatrix();
-                context.translate(coord.x, coord.y + cellSize * 2, coord.z);
-                context.shape(ShapeManager.getShape("square4"));
-                context.popMatrix(); 
-                    
+                M.addChild(cells[i][j].initShapes(context));
             }
         }
-        context.popMatrix();
+        return M;
+    }
+    public void update(Frustum frustum) {
+        for (int i = 0; i < mazeSize; i++) {
+            for (int j = 0; j < mazeSize; j++) {
+                cells[i][j].update(frustum);
+            }
+        }
     }
     public void print() {
         for (int i = 0; i < mazeSize; i++) {

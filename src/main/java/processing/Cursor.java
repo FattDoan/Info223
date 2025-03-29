@@ -27,14 +27,14 @@ public class Cursor {
     }
     
     private PVector mouseDelta() {
-        return new PVector(context.mouseX - centerCursorX, context.mouseY - centerCursorY);
+        return new PVector(context.mouseX - centerCursorX, context.mouseY - centerCursorY).copy();
         // if -pmouseX -pmouseY doesn't work, still dont know why. It should be the same
     }
     private void setCursorCenterScreen() {
         window.warpPointer(centerCursorX, centerCursorY);
     }
     public void updateCursorMovementLinear() {
-        PVector currentMovement = mouseDelta().copy();
+        PVector currentMovement = mouseDelta();
         // Apply a dead zone to filter out tiny movements
         if (Math.abs(currentMovement.x) < 1.0f) currentMovement.x = 0;
         if (Math.abs(currentMovement.y) < 1.0f) currentMovement.y = 0;
@@ -42,7 +42,7 @@ public class Cursor {
         setCursorCenterScreen();
     }
     public void updateCursorMovement() {
-        PVector currentMovement = mouseDelta().copy();
+        PVector currentMovement = mouseDelta();
     
         // Skip processing on first update to avoid initial jump
         // And reset pointer position without applying rotation

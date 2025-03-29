@@ -12,7 +12,7 @@ public class Configs {
     
     // MAZE CONFIGS ---------------------------------------
     private int CELL_SIZE;         // the size of each cell in the maze
-
+    private int LEVEL_HEIGHT;      // the height of each level of the maze
     // PYRAMID CONFIGS ---------------------------------------
     private int PYRAMID_SIZE;       // the size of the bottom maze
 
@@ -32,14 +32,17 @@ public class Configs {
         screenHeight = 900;
         fps = 60;
 
-        // MAZE CONFIGS ---------------------------------------
+        // PYRAMID CONFIGS ---------------------------------------
         PYRAMID_SIZE = 21;
+        
+        // MAZE CONFIGS ---------------------------------------
         CELL_SIZE = 40;
+        LEVEL_HEIGHT = 2;
 
         // CAMERA CONFIGS ---------------------------------------
         playerHeight = CELL_SIZE;
         mouseSensitivity = 0.2f;
-        moveSpeed = 60f;
+        moveSpeed = 80f;
     }
     public interface ConfigsReader {
         boolean getFullScreen();
@@ -48,6 +51,7 @@ public class Configs {
         int getFps();                   // to get actual current fps, use frameRate from PApplet
         int getPyramidSize();
         int getCellSize();
+        int getLevelHeight();
         float getPlayerHeight();
         float getMouseSensitivity();
         float getMoveSpeed();
@@ -59,9 +63,11 @@ public class Configs {
         void setFullScreen(boolean fullScreen);
         void setScreenWidth(int screenWidth);
         void setScreenHeight(int screenHeight);
+        void setFps(int fps);
         void setSCreenResolution(int screenWidth, int screenHeight);
         void setPyramidSize(int mazeSize);
         void setCellSize(int cellSize);
+        void setLevelHeight(int levelHeight);
         void setPlayerHeight(float playerHeight);
         void setMouseSensitivity(float mouseSensitivity);
         void setMoveSpeed(float moveSpeed);
@@ -88,6 +94,9 @@ public class Configs {
 
             @Override
             public int getCellSize() { return instance.CELL_SIZE; }
+
+            @Override
+            public int getLevelHeight() { return instance.LEVEL_HEIGHT; }
 
             @Override
             public float getPlayerHeight() { return instance.playerHeight; }
@@ -134,10 +143,21 @@ public class Configs {
             }
 
             @Override
+            public void setFps(int fps) { 
+                if (fps <= 0) {
+                    throw new IllegalArgumentException("FPS must be greater than 0");
+                }
+                instance.fps = fps; 
+            }
+
+            @Override
             public void setPyramidSize(int mazeSize) { instance.PYRAMID_SIZE = mazeSize; }
 
             @Override
             public void setCellSize(int cellSize) { instance.CELL_SIZE = cellSize; }
+
+            @Override
+            public void setLevelHeight(int levelHeight) { instance.LEVEL_HEIGHT = levelHeight; }
 
             @Override
             public void setPlayerHeight(float playerHeight) { instance.playerHeight = playerHeight; }

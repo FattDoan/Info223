@@ -2,13 +2,19 @@
 
 > Ce README n'est pas un rapport. Il sert simplement de note de synthèse pour le développement mais il sera la partie principale du rapport qui sera au format **PDF** en français.
 
-**TODO:** Performance optimization. If not shaders and lighting will **FUCK** the frame rate so badly.
+## Draw calls optimization and frustum culling
 
-+ near O(1): collision dectection
+**250%+** PERFORMANCE BOOST!!. 
 
-+ raycasting for reducing nb of vertices rendered
+A 5th shot of Martini sent me to God and divine codes manifested themselves. 
 
-+ More possible ways to optimize the PShape rendering
+
+
+**TODO:** 
+
++ near O(1) collision dectection
+
++ shaders and lighting
 
 ## Build system
 

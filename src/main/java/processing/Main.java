@@ -11,15 +11,17 @@ public class Main extends PApplet {
     Configs.ConfigsReader reader = Configs.getReader();
     Configs.ConfigsWriter writer = Configs.getWriter(); 
     Camera camera;
-    ShapeManager sM;
+    ShapeFactory sF = new ShapeFactory(this);
     Pyramid pyramid;
-
+    Frustum frustum;
     private void init() {
+        writer.setLevelHeight(2);
+        writer.setPyramidSize(21);
         // dependency injection
         PVector startingPos = new PVector(reader.getCellSize() + reader.getCellSize()/2, reader.getCellSize(), 0);
         camera = new Camera(this, startingPos, reader.getMouseSensitivity(), reader.getMoveSpeed());
-        sM = ShapeManager.getInstance(this, reader.getCellSize());
-        pyramid = new Pyramid(reader.getPyramidSize(), reader.getCellSize(), this);
+        frustum = new Frustum(camera);
+        pyramid = new Pyramid(reader.getPyramidSize(), reader.getCellSize(), reader.getLevelHeight(), this);
     }
 
     public void settings() {
@@ -35,6 +37,7 @@ public class Main extends PApplet {
     }
 
     public void setup() {
+        writer.setFps(60);
         //noCursor();   // PLEASE DO NOT UNCOMMENT THIS. IDK 
         lights();
         frameRate(reader.getFps());
@@ -45,14 +48,10 @@ public class Main extends PApplet {
     public void draw() {
         background(220);
         System.out.println("FPS: " + frameRate);
-        int totalProcesses = (int) ProcessHandle.allProcesses().count();
-        writer.addTotalGPUDrawCalls(-reader.getTotalGPUDrawCalls());
         camera.updateCamera();
-        pyramid.render();
-    
+        frustum.updateFrustum(camera);
+        pyramid.render(frustum);
 
-        System.out.print("Total CPU Processes: " + totalProcesses + "  --->   ");
-        System.out.println("Total GPU Draw Calls: " + reader.getTotalGPUDrawCalls());
     }
     
     public void keyPressed() {

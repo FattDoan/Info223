@@ -15,13 +15,15 @@ public class Camera {
     private float sensitivity;
     private float moveSpeed;
     
+    private PVector forwardVect = new PVector(0, 0, 1); // for Z movement                                                            
+    private PVector rightVect = new PVector(1, 0, 0); // for X movement
+    private PVector upVect = new PVector(0, 1, 0); // for Y movement 
+                                                   
     private final float lookDistance = 5;
-    private final PVector forwardVect = new PVector(0, 0, 1); // for Z movement
-    private final PVector rightVect = new PVector(1, 0, 0); // for X movement
     public final float fovY = PApplet.PI/2f;
     public final float aspect;    
     public final float zNear = 1;
-    public final float zFar = 500;
+    public final float zFar = 1000;
 
     private int lastFrame = 0;
     private float deltaTime = 0;
@@ -37,7 +39,7 @@ public class Camera {
         this.aspect = (float)context.width / context.height;
     }
     public PVector getPos() {
-        return this.pos;
+        return this.pos.copy();
     }
     public void setSensitivity(float sensitivity) {
         this.sensitivity = sensitivity;
@@ -45,9 +47,18 @@ public class Camera {
     public float getSensitivity() {
         return this.sensitivity;
     }
+    public PVector getForwardVect() {
+        return this.forwardVect.copy();
+    }
+    public PVector getRightVect() {
+        return this.rightVect.copy();
+    }
+    public PVector getUpVect() {
+        return this.upVect.copy();
+    }
 
     public void updateCamera() { 
-        PVector cursorMovement = cursor.getCursorMovement().copy();
+        PVector cursorMovement = cursor.getCursorMovement();
         // Apply to rotation with reduced sensitivity
         this.theta += cursorMovement.x * (sensitivity * 0.5f);
         this.phi += cursorMovement.y * (sensitivity * 0.5f);
@@ -69,12 +80,15 @@ public class Camera {
 
         lookDir = lookDir.normalize();
 
+        // In processing, coord is left-handed
         forwardVect.set(lookDir.x, 0, lookDir.z);
         PVector.cross(forwardVect, new PVector(0, -1, 0), rightVect);
-        
+        PVector.cross(forwardVect, rightVect, upVect);
+
         // preventing when looking straight up or down, we can't move
         forwardVect.normalize();    
-        rightVect.normalize();      
+        rightVect.normalize();
+        upVect.normalize();
 
         updateOnKeyPressed();
 
@@ -110,10 +124,10 @@ public class Camera {
             moveDir.add(PVector.mult(rightVect, 1));
         }
         if (KeyInput.flyUp()) {
-            moveDir.add(new PVector(0, 1, 0));
+            moveDir.add(PVector.mult(upVect, 1));
         }
         if (KeyInput.flyDown()) {
-            moveDir.add(new PVector(0, -1, 0));
+            moveDir.add(PVector.mult(upVect, -1));
         }
         if (moveDir.mag() > 0) {
             moveDir.normalize();
