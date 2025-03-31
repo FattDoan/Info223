@@ -4,6 +4,8 @@ import processing.core.PApplet;
 import processing.core.PVector;
 import com.jogamp.newt.opengl.GLWindow;
 
+// TODO: Cursor movement is really janky at high FPS (120+)
+
 public class Cursor {
 
     private PApplet context;

@@ -7,6 +7,7 @@ public class Camera {
 
     private PApplet context;
     private Cursor cursor;
+    private CollisionDetector collisionDetector;
 
     private PVector pos;        // Position of the camera (main character)
     private PVector target;     // Where we're looking directly at
@@ -18,24 +19,30 @@ public class Camera {
     private PVector forwardVect = new PVector(0, 0, 1); // for Z movement                                                            
     private PVector rightVect = new PVector(1, 0, 0); // for X movement
     private PVector upVect = new PVector(0, 1, 0); // for Y movement 
-                                                   
+    
     private final float lookDistance = 5;
-    public final float fovY = PApplet.PI/2f;
+    public final float fovY = PApplet.PI/3f;
     public final float aspect;    
-    public final float zNear = 1;
-    public final float zFar = 1000;
+    public final float zNear;
+    public final float zFar;
 
     private int lastFrame = 0;
     private float deltaTime = 0;
 
-    public Camera(PApplet context, PVector startingPos, float sensitivity, float moveSpeed) {
+    public Camera(PApplet context, PVector startingPos, float sensitivity, float moveSpeed, CollisionDetector collisionDetector) {
         this.context = context;
+        this.collisionDetector = collisionDetector;  // can be null if in dev mode
+
         this.sensitivity = sensitivity;
         this.moveSpeed = moveSpeed;
         this.pos = startingPos.copy();
         this.target = startingPos.copy(); this.target.z += lookDistance;
         this.theta = this.phi = 0;     // look straight ahead          
         this.cursor = new Cursor(context);
+
+        this.zFar = 500f;
+        this.zNear = 0.01f;
+
         this.aspect = (float)context.width / context.height;
     }
     public PVector getPos() {
@@ -132,7 +139,11 @@ public class Camera {
         if (moveDir.mag() > 0) {
             moveDir.normalize();
             moveDir.mult(camSpeed);
-            this.pos.add(moveDir);
+            if (this.collisionDetector != null) {
+                this.pos = collisionDetector.resolveCollision(this.pos, moveDir);
+            } else {
+                this.pos.add(moveDir);
+            }
         }
-    }
+    } 
 }

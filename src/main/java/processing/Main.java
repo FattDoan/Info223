@@ -14,14 +14,17 @@ public class Main extends PApplet {
     ShapeFactory sF = new ShapeFactory(this);
     Pyramid pyramid;
     Frustum frustum;
+    CollisionDetector collisionDetector;
+
     private void init() {
         writer.setLevelHeight(2);
         writer.setPyramidSize(21);
         // dependency injection
         PVector startingPos = new PVector(reader.getCellSize() + reader.getCellSize()/2, reader.getCellSize(), 0);
-        camera = new Camera(this, startingPos, reader.getMouseSensitivity(), reader.getMoveSpeed());
-        frustum = new Frustum(camera);
         pyramid = new Pyramid(reader.getPyramidSize(), reader.getCellSize(), reader.getLevelHeight(), this);
+        collisionDetector = new CollisionDetector(pyramid);
+        camera = new Camera(this, startingPos, reader.getMouseSensitivity(), reader.getMoveSpeed(), collisionDetector);
+        frustum = new Frustum(camera); 
     }
 
     public void settings() {

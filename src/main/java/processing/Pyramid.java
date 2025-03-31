@@ -21,6 +21,21 @@ public class Pyramid {
         generatePyramid();
         initShape();
     }
+    public Maze getMaze(int i) {
+        return mazes.get(i);
+    }
+    public int getPyramidSize() {
+        return pyramidSize;
+    }
+    public int getCellSize() {
+        return cellSize;
+    }
+    public int getLevelHeight() {
+        return levelHeight;
+    }
+    public int getNbMazes() {
+        return (pyramidSize - 1) / 2;
+    }
     public void generatePyramid() {
         
         int nbMazes = (pyramidSize - 1) / 2;

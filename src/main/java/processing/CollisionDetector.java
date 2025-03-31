@@ -1,0 +1,56 @@
+package processing;
+
+import processing.core.PApplet;
+import processing.core.PVector;
+
+public class CollisionDetector {
+    private Pyramid pyramid;
+
+    public CollisionDetector(Pyramid pyramid) {
+        this.pyramid = pyramid;
+    }
+    public boolean isInPyramid(PVector pos) {
+        if (pos.y < 0 || pos.y > pyramid.getLevelHeight() * pyramid.getCellSize() * pyramid.getNbMazes()) {
+            return false;
+        }
+        int mazeLevel = PApplet.floor(pos.y / (pyramid.getCellSize() * pyramid.getLevelHeight()));  
+        return pyramid.getMaze(mazeLevel).isPointInsideAABB(pos); 
+    }
+    public boolean isColliding(PVector pos) {
+        if (!isInPyramid(pos)) {
+            return false;
+        }
+        PVector cellIndex = Maze.getCellIndex(pos, pyramid.getCellSize(), pyramid.getLevelHeight());
+        return pyramid.getMaze((int)cellIndex.z).getCell((int)cellIndex.x, (int)cellIndex.y).isWall();
+    }
+    public PVector resolveCollision(PVector pos, PVector moveDir) {
+        PVector newPos = pos.copy().add(moveDir);
+        if (!isColliding(newPos)) {
+            return newPos;
+        }
+
+        // Try moving along individual axes instead of diagonally
+        PVector horizontalMove = new PVector(moveDir.x, 0, 0);
+        PVector horizontalPos = pos.copy().add(horizontalMove);
+        boolean horizontalCollision = isColliding(horizontalPos);
+        
+        PVector verticalMove = new PVector(0, moveDir.y, 0);
+        PVector verticalPos = pos.copy().add(verticalMove);
+        boolean verticalCollision = isColliding(verticalPos);
+        
+        PVector depthMove = new PVector(0, 0, moveDir.z);
+        PVector depthPos = pos.copy().add(depthMove);
+        boolean depthCollision = isColliding(depthPos);
+        
+        // Create a new movement vector with only the non-colliding components
+        PVector safeMove = new PVector(
+            horizontalCollision ? 0 : moveDir.x,
+            verticalCollision ? 0 : moveDir.y,
+            depthCollision ? 0 : moveDir.z
+        );
+        
+        // Return the safe position
+        return pos.copy().add(safeMove);
+
+    }
+}
