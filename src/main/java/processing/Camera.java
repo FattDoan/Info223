@@ -20,7 +20,7 @@ public class Camera {
     private PVector rightVect = new PVector(1, 0, 0); // for X movement
     private PVector upVect = new PVector(0, 1, 0); // for Y movement 
     
-    private final float lookDistance = 5;
+    private final float lookDistance = 4;
     public final float fovY = PApplet.PI/3f;
     public final float aspect;    
     public final float zNear;
@@ -40,7 +40,7 @@ public class Camera {
         this.theta = this.phi = 0;     // look straight ahead          
         this.cursor = new Cursor(context);
 
-        this.zFar = 500f;
+        this.zFar = 1000f;
         this.zNear = 0.01f;
 
         this.aspect = (float)context.width / context.height;
@@ -66,9 +66,9 @@ public class Camera {
 
     public void updateCamera() { 
         PVector cursorMovement = cursor.getCursorMovement();
-        // Apply to rotation with reduced sensitivity
-        this.theta += cursorMovement.x * (sensitivity * 0.5f);
-        this.phi += cursorMovement.y * (sensitivity * 0.5f);
+        // Apply to rotation with sensitivity
+        this.theta += cursorMovement.x * sensitivity;
+        this.phi += cursorMovement.y * sensitivity;
         this.phi = PApplet.constrain(this.phi, -89.f, 89.f);
         
         // Trigonometric rotation implementation
@@ -107,6 +107,11 @@ public class Camera {
                        this.target.x, this.target.y, this.target.z, 
                        0, -1, 0);
         context.perspective(fovY, aspect, zNear, zFar);
+
+        context.spotLight(255, 255, 220, this.pos.x, this.pos.y, this.pos.z, 
+                          lookDir.x, lookDir.y, lookDir.z, 
+                          PApplet.PI/5, 400);
+
     }
     public void updateOnKeyPressed() {
         PVector moveDir = new PVector(0, 0, 0);
@@ -140,7 +145,7 @@ public class Camera {
             moveDir.normalize();
             moveDir.mult(camSpeed);
             if (this.collisionDetector != null) {
-                this.pos = collisionDetector.resolveCollision(this.pos, moveDir);
+                this.pos = collisionDetector.resolveCollision(this.pos, moveDir).copy();
             } else {
                 this.pos.add(moveDir);
             }

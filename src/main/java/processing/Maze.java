@@ -15,7 +15,7 @@ public class Maze extends AABB {
     // level starting from 0 -> (PYRAMID_SIZE - 1)/2 -1 max
     public Maze(int level, int mazeSize, int cellSize, int levelHeight, PApplet context, boolean letEmpty) {
         super(new PVector(level * cellSize, level * levelHeight * cellSize, level * cellSize), 
-              new PVector((level + mazeSize - 1) * cellSize, (level + 1) * levelHeight * cellSize, (level + mazeSize - 1) * cellSize));
+              new PVector((level + mazeSize) * cellSize, (level + 1) * levelHeight * cellSize, (level + mazeSize) * cellSize));
         this.context = context;
         this.level = level;
         this.mazeSize = mazeSize;
@@ -93,6 +93,7 @@ public class Maze extends AABB {
 
         cells[0][1] = new StartCell(getCellCoord(0, 1, level, cellSize, levelHeight), this);// entree
         cells[mazeSize - 2][mazeSize - 1] = new EndCell(getCellCoord(mazeSize - 2, mazeSize - 1, level, cellSize, levelHeight), this); // sortie
+    
     }
 
     public void cellsSideCalculate() {

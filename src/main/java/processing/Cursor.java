@@ -16,6 +16,8 @@ public class Cursor {
     private PVector previousMovement = new PVector(0, 0);
     private final float dampingFactor = 0.6f; // Higher values = less damping
     private boolean isFirstUpdate = true; 
+     
+    private float deltaTime;
     
     public Cursor(PApplet context) {
         this.context = context;
@@ -35,34 +37,26 @@ public class Cursor {
     private void setCursorCenterScreen() {
         window.warpPointer(centerCursorX, centerCursorY);
     }
-    public void updateCursorMovementLinear() {
-        PVector currentMovement = mouseDelta();
-        // Apply a dead zone to filter out tiny movements
-        if (Math.abs(currentMovement.x) < 1.0f) currentMovement.x = 0;
-        if (Math.abs(currentMovement.y) < 1.0f) currentMovement.y = 0;
-        accumulatedMovement = currentMovement.copy();
-        setCursorCenterScreen();
-    }
     public void updateCursorMovement() {
         PVector currentMovement = mouseDelta();
-    
         // Skip processing on first update to avoid initial jump
         // And reset pointer position without applying rotation
         if (isFirstUpdate) {
             isFirstUpdate = false;
             return;
         }
-    
-        // Apply a dead zone to filter out tiny movements
-        if (Math.abs(currentMovement.x) < 1.0f) currentMovement.x = 0;
-        if (Math.abs(currentMovement.y) < 1.0f) currentMovement.y = 0;
         
+        deltaTime = 1.0f / context.frameRate; // Avoid division by zero if FPS drops too low
+        float deadZone = PApplet.map(context.frameRate, 0f, 240f, 1.2f, 0.05f);
+        
+        // Apply a dead zone to filter out tiny movements
+        if (Math.abs(currentMovement.x) < deadZone) currentMovement.x = 0;
+        if (Math.abs(currentMovement.y) < deadZone) currentMovement.y = 0;  
         // Blend previous and current movement with less weight on previous
         PVector blendedMovement = new PVector(
             currentMovement.x * 0.8f + previousMovement.x * 0.2f,
             currentMovement.y * 0.8f + previousMovement.y * 0.2f
         );
-        
         // More gradual acceleration curve with lower sensitivity for small movements
         float magnitudeSq = blendedMovement.magSq();
         float scaleFactor = 1.0f;
@@ -72,15 +66,13 @@ public class Cursor {
             scaleFactor = PApplet.constrain(scaleFactor, 0.3f, 0.9f);
         }
         
-        blendedMovement.mult(scaleFactor);    
+        blendedMovement.mult(scaleFactor); 
         // Apply damping to previous velocity
         accumulatedMovement.mult(dampingFactor);
         // Add new movement with reduced impact
         accumulatedMovement.add(blendedMovement.mult(0.7f));
-    
         // Store for next frame
         previousMovement = currentMovement.copy();
- 
         setCursorCenterScreen();
     }
     public PVector getCursorMovement() {

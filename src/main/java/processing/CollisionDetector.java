@@ -20,8 +20,17 @@ public class CollisionDetector {
         if (!isInPyramid(pos)) {
             return false;
         }
-        PVector cellIndex = Maze.getCellIndex(pos, pyramid.getCellSize(), pyramid.getLevelHeight());
-        return pyramid.getMaze((int)cellIndex.z).getCell((int)cellIndex.x, (int)cellIndex.y).isWall();
+        //pseudo AABB box with pos the center
+
+        PVector cellIndex0 = Maze.getCellIndex(PVector.add(pos, new PVector(4,0,4)), pyramid.getCellSize(), pyramid.getLevelHeight());
+        PVector cellIndex1 = Maze.getCellIndex(PVector.add(pos, new PVector(4,0,-4)), pyramid.getCellSize(), pyramid.getLevelHeight());
+        PVector cellIndex2 = Maze.getCellIndex(PVector.add(pos, new PVector(-4,0,4)), pyramid.getCellSize(), pyramid.getLevelHeight());
+        PVector cellIndex3 = Maze.getCellIndex(PVector.add(pos, new PVector(-4,0,-4)), pyramid.getCellSize(), pyramid.getLevelHeight());
+
+        return pyramid.getMaze((int)cellIndex0.z).getCell((int)cellIndex0.x, (int)cellIndex0.y).isWall() ||
+               pyramid.getMaze((int)cellIndex1.z).getCell((int)cellIndex1.x, (int)cellIndex1.y).isWall() ||
+               pyramid.getMaze((int)cellIndex2.z).getCell((int)cellIndex2.x, (int)cellIndex2.y).isWall() ||
+               pyramid.getMaze((int)cellIndex3.z).getCell((int)cellIndex3.x, (int)cellIndex3.y).isWall();
     }
     public PVector resolveCollision(PVector pos, PVector moveDir) {
         PVector newPos = pos.copy().add(moveDir);
@@ -51,6 +60,5 @@ public class CollisionDetector {
         
         // Return the safe position
         return pos.copy().add(safeMove);
-
     }
 }

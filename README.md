@@ -2,19 +2,25 @@
 
 > Ce README n'est pas un rapport. Il sert simplement de note de synthèse pour le développement mais il sera la partie principale du rapport qui sera au format **PDF** en français.
 
-## Draw calls optimization and frustum culling
+## Implemented features
 
-**250%+** PERFORMANCE BOOST!!. 
+- **Draw calls optimization**: no more seperate vertices draw (i.e batch all the vertices into shapes and send to the GPU all together)
 
-A 5th shot of Martini sent me to God and divine codes manifested themselves. 
+- **Frustum culling**: combined with predefined PShape from draw calls optimization -> lightning fast performances (achieving 250+ fps even with Fragment Shading on 1080p)
 
+- **Texture, Lighting and Shaders**: implement both Vertex Shading and Fragment Shading (prefer Fragment Shading for more realistic lighting)
 
+- **Near O(1) collision detection**: thanks to static environment
 
-**TODO:** 
+### TODO
 
-+ near O(1) collision dectection
+- [ ] Touching up the pyramid appearance (texture for floor, roof and the outside)
 
-+ shaders and lighting
+- [ ] Add map and compass
+
+- [ ] Add sun lighting and dessert vibe outside pyramid
+
+- [ ] Add NPC
 
 ## Build system
 

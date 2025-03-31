@@ -41,7 +41,7 @@ public class Configs {
 
         // CAMERA CONFIGS ---------------------------------------
         playerHeight = CELL_SIZE;
-        mouseSensitivity = 0.2f;
+        mouseSensitivity = 0.075f;
         moveSpeed = 80f;
     }
     public interface ConfigsReader {

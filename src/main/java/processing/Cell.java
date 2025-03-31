@@ -8,37 +8,7 @@ import processing.core.PShape;
 // in left-handed coord system
 // (x, y, z) is top-left coord, the height and width is Cell.SIZE
 
-class AABB {
-    private PVector min = new PVector(0,0,0);
-    private PVector max = new PVector(0,0,0);
-    private PVector center = new PVector(0,0,0);
-    private PVector extents = new PVector(0,0,0);
-    public AABB(PVector min, PVector max) {
-        this.min = min.copy();
-        this.max = max.copy();
-        this.center = (min.copy().add(max)).mult(0.5f);
-        this.extents = max.copy().sub(this.center);;
-    }
-    public boolean isOnOrForwardPlane(Plane plane) {
-        float r = extents.x * PApplet.abs(plane.getNormal().x) + extents.y * PApplet.abs(plane.getNormal().y) + extents.z * PApplet.abs(plane.getNormal().z);
-        return -r <= plane.getSignedDistance(center);
-    }
-    public boolean isOnFrustum(Frustum frustum) {
-        for (int i = 0; i < 6; i++) {
-            if (!isOnOrForwardPlane(frustum.getPlane(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
-    public boolean isPointInsideAABB(PVector point) {
-        return point.x >= min.x && point.x <= max.x &&
-               point.y >= min.y && point.y <= max.y &&
-               point.z >= min.z && point.z <= max.z;
-    }
-    public PVector getMin() { return min; }
-    public PVector getMax() { return max; }
-}
+
 abstract class Cell extends AABB {
     protected final PVector coord;
     protected final Maze maze;        // reference to the maze
@@ -165,7 +135,7 @@ class WallCell extends Cell {
         if (i == 0 || !maze.getCell(i-1,j).isWall()) {
             PShape s = ShapeFactory.square0(getSize(), height);
             if (sides[3]) {
-                s.setFill(context.color(255,255,0)); //yellow
+                s.setTint(context.color(255,255,0)); //yellow
             }
             cellShape.addChild(s);
         }
@@ -173,7 +143,7 @@ class WallCell extends Cell {
         if (j+1 == maze.getMazeSize() || !maze.getCell(i,j+1).isWall()) {
             PShape s = ShapeFactory.square3(getSize(), height);
             if (sides[2]) {
-                s.setFill(context.color(0,255,0)); //green
+                s.setTint(context.color(0,255,0)); //green
             }
             cellShape.addChild(s);
         }
@@ -181,7 +151,7 @@ class WallCell extends Cell {
         if (i+1 == maze.getMazeSize() || !maze.getCell(i+1,j).isWall()) {
             PShape s = ShapeFactory.square1(getSize(), height);
             if (sides[0]) {
-                s.setFill(context.color(255,0,0)); //red
+                s.setTint(context.color(255,0,0)); //red
             }
             cellShape.addChild(s);
         }
@@ -189,7 +159,7 @@ class WallCell extends Cell {
         if (j == 0|| !maze.getCell(i,j-1).isWall()) {
             PShape s = ShapeFactory.square2(getSize(), height);
             if (sides[1]) {
-                s.setFill(context.color(0,0,255)); //blue
+                s.setTint(context.color(0,0,255)); //blue
             }
             cellShape.addChild(s);
         }
