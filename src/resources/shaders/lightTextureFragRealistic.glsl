@@ -24,7 +24,7 @@ void main() {
     vec3 direction = normalize(lightPos - ecPosition);
 
     float distance = length(lightPos - ecPosition);
-    float attenuation = 1.0 / (1.0 + 0.001 * distance + 0.0001 * distance * distance);
+    float attenuation = 1.0 / (1.0 + 0.005 * distance + 0.00005 * distance * distance);
 
     float intensity = max(0.0, dot(direction, ecNormal)) * attenuation;
 

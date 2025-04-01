@@ -16,7 +16,7 @@ public class Main extends PApplet {
     Configs.ConfigsReader reader = Configs.getReader();
     Configs.ConfigsWriter writer = Configs.getWriter(); 
     Camera camera;
-    PImage stonesTex;
+    PImage textures;
     ShapeFactory sF;
     Pyramid pyramid;
     Frustum frustum;
@@ -24,15 +24,15 @@ public class Main extends PApplet {
     PShader lightShader, lightTextureShader;
 
     private void init() {
-        stonesTex = loadImage("src/resources/assets/stones.jpg");
+        textures = loadImage("src/resources/assets/textures.png");
         //lightTextureShader = loadShader("src/resources/shaders/lightTextureFrag.glsl", "src/resources/shaders/lightTextureVert.glsl");
         lightTextureShader = loadShader("src/resources/shaders/lightTextureFragRealistic.glsl", "src/resources/shaders/lightTextureVertRealistic.glsl");
-        lightShader = loadShader("src/resources/shaders/lightFrag.glsl", "src/resources/shaders/lightVert.glsl");
+        //lightShader = loadShader("src/resources/shaders/lightFrag.glsl", "src/resources/shaders/lightVert.glsl");
     
         writer.setLevelHeight(2);
         writer.setPyramidSize(21);
         // dependency injection
-        sF = new ShapeFactory(this, stonesTex);
+        sF = new ShapeFactory(this, textures);
         PVector startingPos = new PVector(reader.getCellSize() + reader.getCellSize()/2, reader.getCellSize(), 0);
         pyramid = new Pyramid(reader.getPyramidSize(), reader.getCellSize(), reader.getLevelHeight(), this);
         collisionDetector = new CollisionDetector(pyramid);

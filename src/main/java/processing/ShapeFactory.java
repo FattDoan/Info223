@@ -6,11 +6,23 @@ import processing.core.PImage;
 
 public class ShapeFactory {
     private static PApplet context;
-    private static PImage stonesTex;
+    private static PImage textures;
 
-    public ShapeFactory(PApplet context, PImage stonesTex) {
+    private static int stones_w, stones_h, stones_x, stones_y;
+    private static int floor_w, floor_h, floor_x, floor_y;
+    public ShapeFactory(PApplet context, PImage textures) {
         ShapeFactory.context = context;
-        ShapeFactory.stonesTex = stonesTex;
+        ShapeFactory.textures = textures;
+
+        stones_w = 312;
+        stones_h = 512;
+        stones_x = 0;
+        stones_y = 0;
+
+        floor_w = 512;
+        floor_h = 512;
+        floor_x = 512;
+        floor_y = 0;
     }
 
     // 6 faces of width * width * height block
@@ -19,13 +31,13 @@ public class ShapeFactory {
         PShape s = context.createShape();
         s.beginShape(PApplet.QUADS);
         s.normal(0f, 0f, -1f);
-        s.texture(stonesTex);
+        s.texture(textures);
         s.noStroke();
         //s.fill(255, 255, 255);
         s.vertex(0, 0, 0, 0, 0);
-        s.vertex(width, 0,0, stonesTex.width, 0);
-        s.vertex(width, height,0, stonesTex.width, stonesTex.height);
-        s.vertex(0, height,0, 0, stonesTex.height);
+        s.vertex(width, 0,0, stones_w, 0);
+        s.vertex(width, height,0, stones_w, stones_h);
+        s.vertex(0, height,0, 0, stones_h);
         s.endShape();    
         return s;
     } 
@@ -33,13 +45,13 @@ public class ShapeFactory {
         PShape s = context.createShape();
         s.beginShape(PApplet.QUADS);
         s.normal(0f, 0f, 1f); 
-        s.texture(stonesTex);
+        s.texture(textures);
         s.noStroke();
         //s.fill(255, 255, 255);
         s.vertex(0, 0, width, 0, 0);
-        s.vertex(width, 0, width, stonesTex.width, 0);
-        s.vertex(width, height, width, stonesTex.width, stonesTex.height);
-        s.vertex(0, height, width, 0, stonesTex.height);
+        s.vertex(width, 0, width, stones_w, 0);
+        s.vertex(width, height, width, stones_w, stones_h);
+        s.vertex(0, height, width, 0, stones_h);
         s.endShape();    
         return s;
     } 
@@ -48,12 +60,12 @@ public class ShapeFactory {
         s.beginShape(PApplet.QUADS);
         //s.fill(255, 255, 255);
         s.normal(-1f, 0f, 0f);
-        s.texture(stonesTex);
+        s.texture(textures);
         s.noStroke();
         s.vertex(0, 0, width, 0, 0);
-        s.vertex(0, 0, 0, stonesTex.width, 0); 
-        s.vertex(0, height ,0, stonesTex.width, stonesTex.height);
-        s.vertex(0, height, width, 0, stonesTex.height);
+        s.vertex(0, 0, 0, stones_w, 0); 
+        s.vertex(0, height ,0, stones_w, stones_h);
+        s.vertex(0, height, width, 0, stones_h);
         s.endShape();    
         return s;
     }
@@ -62,12 +74,12 @@ public class ShapeFactory {
         s.beginShape(PApplet.QUADS);
         //s.fill(255, 255, 255);
         s.normal(1f, 0f, 0f);
-        s.texture(stonesTex);
+        s.texture(textures);
         s.noStroke();
         s.vertex(width, 0, width, 0, 0);
-        s.vertex(width, 0, 0, stonesTex.width, 0);
-        s.vertex(width, height, 0, stonesTex.width, stonesTex.height);
-        s.vertex(width, height, width, 0, stonesTex.height); 
+        s.vertex(width, 0, 0, stones_w, 0);
+        s.vertex(width, height, 0, stones_w, stones_h);
+        s.vertex(width, height, width, 0, stones_h); 
         s.endShape();    
         return s;
     } 
@@ -75,12 +87,13 @@ public class ShapeFactory {
         PShape s = context.createShape();
         s.beginShape(PApplet.QUADS);
         s.normal(0f, 1f, 0f);
-        s.fill(0);
+        //s.fill(0);
+        s.texture(textures);
         s.noStroke();
-        s.vertex(0, 0, 0);
-        s.vertex(width, 0, 0);
-        s.vertex(width, 0, width);
-        s.vertex(0, 0, width);
+        s.vertex(0, 0, 0, floor_x, floor_y);
+        s.vertex(width, 0, 0, floor_x + floor_w, floor_y);
+        s.vertex(width, 0, width, floor_x + floor_w, floor_y + floor_h);
+        s.vertex(0, 0, width, floor_x, floor_y + floor_h);
         s.endShape();    
         return s;
     } 

@@ -106,7 +106,6 @@ class PathCell extends Cell {
         PShape s5 = ShapeFactory.square5(getSize(), getSize());
         s5.translate(0, getSize() * (maze.getLevelHeight() - 1), 0);
         cellShape.addChild(s5);
-        
         return this.S = cellShape;
     } 
 
@@ -169,7 +168,6 @@ class WallCell extends Cell {
         s.translate(0, getSize() * (maze.getLevelHeight() - 1), 0);
 
         cellShape.addChild(s);
-    
         return this.S = cellShape;
     }
 

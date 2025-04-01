@@ -21,7 +21,6 @@ public class CollisionDetector {
             return false;
         }
         //pseudo AABB box with pos the center
-
         PVector cellIndex0 = Maze.getCellIndex(PVector.add(pos, new PVector(4,0,4)), pyramid.getCellSize(), pyramid.getLevelHeight());
         PVector cellIndex1 = Maze.getCellIndex(PVector.add(pos, new PVector(4,0,-4)), pyramid.getCellSize(), pyramid.getLevelHeight());
         PVector cellIndex2 = Maze.getCellIndex(PVector.add(pos, new PVector(-4,0,4)), pyramid.getCellSize(), pyramid.getLevelHeight());

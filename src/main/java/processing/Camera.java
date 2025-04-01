@@ -108,9 +108,9 @@ public class Camera {
                        0, -1, 0);
         context.perspective(fovY, aspect, zNear, zFar);
 
-        context.spotLight(255, 255, 220, this.pos.x, this.pos.y, this.pos.z, 
+        context.spotLight(255, 255, 255, this.pos.x, this.pos.y, this.pos.z, 
                           lookDir.x, lookDir.y, lookDir.z, 
-                          PApplet.PI/5, 400);
+                          PApplet.PI/4, 10);
 
     }
     public void updateOnKeyPressed() {
