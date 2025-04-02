@@ -27,7 +27,7 @@ public class Main extends PApplet {
         textures = loadImage("src/resources/assets/textures.png");
         //lightTextureShader = loadShader("src/resources/shaders/lightTextureFrag.glsl", "src/resources/shaders/lightTextureVert.glsl");
         lightTextureShader = loadShader("src/resources/shaders/lightTextureFragRealistic.glsl", "src/resources/shaders/lightTextureVertRealistic.glsl");
-        //lightShader = loadShader("src/resources/shaders/lightFrag.glsl", "src/resources/shaders/lightVert.glsl");
+        lightShader = loadShader("src/resources/shaders/lightFrag.glsl", "src/resources/shaders/lightVert.glsl");
     
         writer.setLevelHeight(2);
         writer.setPyramidSize(21);
@@ -61,14 +61,20 @@ public class Main extends PApplet {
     }
     
     public void draw() {
-        background(220);
+        background(240, 255, 255);
+        //lightFalloff(1, 0, 0);
+        //directionalLight(255, 255, 255, 0, -1, 0);
+        lights();
+        pointLight(255, 255, 255, -50, 1000, -50);
+        
+
         shader(lightTextureShader);
-        //lights();
         System.out.println("FPS: " + frameRate);
         camera.updateCamera();
         frustum.updateFrustum(camera);
         pyramid.render(frustum);
 
+        resetShader();
         /*
         pushMatrix();
         PVector pos = camera.getPos();

@@ -32,6 +32,7 @@ abstract class Cell extends AABB {
     public void setSides(int i, boolean val) { sides[i] = val; }
     
     // update based on frustum
+    @Override
     public void update(Frustum frustum) {
         if (isOnFrustum(frustum)) S.setVisible(true);
         else S.setVisible(false);

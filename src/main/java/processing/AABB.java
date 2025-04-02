@@ -3,7 +3,7 @@ package processing;
 import processing.core.PApplet;
 import processing.core.PVector;
 
-public class AABB {
+public abstract class AABB {
     private PVector min = new PVector(0,0,0);
     private PVector max = new PVector(0,0,0);
     private PVector center = new PVector(0,0,0);
@@ -31,6 +31,7 @@ public class AABB {
                point.y >= min.y && point.y <= max.y &&
                point.z >= min.z && point.z <= max.z;
     }
+    public abstract void update(Frustum frustum);
     public PVector getMin() { return min; }
     public PVector getMax() { return max; }
 }

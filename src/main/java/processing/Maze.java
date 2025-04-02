@@ -126,6 +126,8 @@ public class Maze extends AABB {
         }
         return M;
     }
+
+    @Override
     public void update(Frustum frustum) {
         if (isOnFrustum(frustum)) 
         {
