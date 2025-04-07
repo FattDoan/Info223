@@ -65,11 +65,12 @@ public class Main extends PApplet {
         background(240, 255, 255);
         //lightFalloff(1, 0, 0);
         //directionalLight(255, 255, 255, 0, -1, 0);
-        //lights();
+        lights();
         //pointLight(255, 255, 255, -50, 1000, -50);
         
 
-        shader(lightTextureShader);
+        //shader(lightTextureShader);
+
         System.out.println("FPS: " + frameRate);
         camera.updateCamera();
         frustum.updateFrustum(camera);

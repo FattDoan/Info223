@@ -12,7 +12,9 @@ public class ShapeFactory {
     private static int stones_w, stones_h, stones_x, stones_y;
     private static int floor_w, floor_h, floor_x, floor_y;
     private static int brick_w, brick_h, brick_x, brick_y;
-    
+   
+    private static float zBuffer = 0.1f;    // Avoid z-fighting
+
     public ShapeFactory(PApplet context, PImage textures) {
         ShapeFactory.context = context;
         ShapeFactory.textures = textures;
@@ -133,7 +135,7 @@ public class ShapeFactory {
         s.endShape();    
         return s;
     }
-    public static PShape py_box(int l, int h, int w) {
+    public static PShape py_box(float l, float h, float w) {
         setRepeat();
         float ratio = (float) l / w;
         PShape s = context.createShape();  
@@ -147,7 +149,7 @@ public class ShapeFactory {
         s.endShape();
         return s;
     }
-    public static PShape py_1SideBoxRing(int l, int h , int w) {
+    public static PShape py_1SideBoxRing(float l, float h , float w) {
         PShape S = context.createShape(PApplet.GROUP);
         PShape s0 = py_box(l, h, w);
         PShape s1 = py_box(l, h, w);
@@ -161,16 +163,16 @@ public class ShapeFactory {
         PShape bR = context.createShape(PApplet.GROUP);
   
         PShape s0 = py_1SideBoxRing(l, h, w);
-        PShape s1 = py_1SideBoxRing(l, h, w);
+        PShape s1 = py_1SideBoxRing(l, h + zBuffer, w);
         s1.rotateZ(PApplet.PI/2);
         s1.rotateY(-PApplet.PI/2);
         s1.translate(w*2, 0, h);
         
-        PShape s2 = py_1SideBoxRing(l, h, w);
+        PShape s2 = py_1SideBoxRing(l, h + zBuffer*1.5f, w);
         s2.rotateZ(PApplet.PI/2);
         s2.translate(l, 0, 0);
         
-        PShape s3 = py_1SideBoxRing(l, h, w);
+        PShape s3 = py_1SideBoxRing(l, h + zBuffer*2f, w);
         s3.rotateX(-PApplet.PI/2);
         s3.translate(0, l - 2*w, h);
         bR.addChild(s0);

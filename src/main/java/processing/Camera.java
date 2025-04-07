@@ -41,7 +41,7 @@ public class Camera {
         this.cursor = new Cursor(context);
 
         this.zFar = 1000f;
-        this.zNear = 0.01f;
+        this.zNear = 1f;
 
         this.aspect = (float)context.width / context.height;
     }
