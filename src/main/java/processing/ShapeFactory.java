@@ -164,19 +164,25 @@ public class ShapeFactory {
         PShape s1 = py_1SideBoxRing(l, h, w);
         s1.rotateZ(PApplet.PI/2);
         s1.rotateY(-PApplet.PI/2);
-        s1.translate(w, 0, h);
+        s1.translate(w*2, 0, h);
+        
         PShape s2 = py_1SideBoxRing(l, h, w);
         s2.rotateZ(PApplet.PI/2);
         s2.translate(l, 0, 0);
         
         PShape s3 = py_1SideBoxRing(l, h, w);
         s3.rotateX(-PApplet.PI/2);
-        s3.translate(0, l - w, h);
+        s3.translate(0, l - 2*w, h);
         bR.addChild(s0);
         bR.addChild(s1);
         bR.addChild(s2);
         bR.addChild(s3);
-        
+       
+
+        // TO FILL THE HOLE FOR THE DOOR is s3
+        // thi is in (x,y,z) where x is from left to right (of the camera)
+        //                         y is from front to back (of the camera)
+        //                         z is from top to bottom (of the camera)
         return bR;
     }
 }

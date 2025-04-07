@@ -4,6 +4,7 @@ import processing.core.PApplet;
 import processing.core.PVector;
 import processing.core.PImage;
 import processing.opengl.PShader;
+import processing.core.PShape;
 
 public class Main extends PApplet {
     public static void main(String[] args) {
@@ -64,8 +65,8 @@ public class Main extends PApplet {
         background(240, 255, 255);
         //lightFalloff(1, 0, 0);
         //directionalLight(255, 255, 255, 0, -1, 0);
-        lights();
-        pointLight(255, 255, 255, -50, 1000, -50);
+        //lights();
+        //pointLight(255, 255, 255, -50, 1000, -50);
         
 
         shader(lightTextureShader);
@@ -74,18 +75,11 @@ public class Main extends PApplet {
         frustum.updateFrustum(camera);
         pyramid.render(frustum);
 
-        resetShader();
         /*
-        pushMatrix();
-        PVector pos = camera.getPos();
-        translate(pos.x, pos.y, pos.z + 80f);
-        resetShader();
-        shader(lightShader);
-        sphereDetail(20);
-        fill(255, 0, 0);
-        sphere(20);
-        resetShader();
-        popMatrix();
+        PShape z = ShapeFactory.py_boxRing(1000, 100, 100);
+        z.rotateX(-PI/2);
+        z.translate(0, 0, 1000);
+        shape(z);
         */
     }
     

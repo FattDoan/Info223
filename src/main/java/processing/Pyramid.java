@@ -11,13 +11,15 @@ public class Pyramid {
     private int cellSize;
     private int levelHeight;
     private PShape P;
+    private PyramidExterior pyEx;
 
     public Pyramid(int pyramidSize, int cellSize, int levelHeight, PApplet context) {
         this.pyramidSize = pyramidSize;
         this.cellSize = cellSize;
         this.levelHeight = levelHeight;
         this.context = context;
-        mazes = new ArrayList<Maze>();
+        this.mazes = new ArrayList<Maze>(); 
+        this.pyEx = new PyramidExterior(context, pyramidSize, cellSize, levelHeight);
         generatePyramid();
         initShape();
     }
@@ -53,12 +55,14 @@ public class Pyramid {
         for (Maze maze : mazes) {
             P.addChild(maze.initShape());
         }
+        pyEx.initShape();
     }
     public void render(Frustum frustum) {
        for (Maze maze : mazes) {
            maze.update(frustum);
         }
-        context.shape(P); 
+        context.shape(P);  
+        pyEx.render(frustum); 
     }
 
 }
