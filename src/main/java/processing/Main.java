@@ -20,10 +20,12 @@ public class Main extends PApplet {
     PImage textures;
     ShapeFactory sF;
     Pyramid pyramid;
+    PyramidExterior pyEx;
     Frustum frustum;
     CollisionDetector collisionDetector;
     PShader lightShader, lightTextureShader;
 
+    PShape sandFloor;
     private void init() {
         textures = loadImage("src/resources/assets/textures.png");
         //lightTextureShader = loadShader("src/resources/shaders/lightTextureFrag.glsl", "src/resources/shaders/lightTextureVert.glsl");
@@ -35,10 +37,16 @@ public class Main extends PApplet {
         // dependency injection
         sF = new ShapeFactory(this, textures);
         PVector startingPos = new PVector(reader.getCellSize() + reader.getCellSize()/2, reader.getCellSize(), 0);
+        
         pyramid = new Pyramid(reader.getPyramidSize(), reader.getCellSize(), reader.getLevelHeight(), this);
+        pyEx = new PyramidExterior(this, reader.getPyramidSize(), reader.getCellSize(), reader.getLevelHeight());
+        pyEx.initShape();
+
         collisionDetector = new CollisionDetector(pyramid);
         camera = new Camera(this, startingPos, reader.getMouseSensitivity(), reader.getMoveSpeed(), collisionDetector);
         frustum = new Frustum(camera); 
+    
+        sandFloor = ShapeFactory.sandFloor(1200f);
     }
 
     public void settings() {
@@ -60,28 +68,26 @@ public class Main extends PApplet {
         randomSeed(2);
         init();
     }
-    
+        
     public void draw() {
         background(240, 255, 255);
         //lightFalloff(1, 0, 0);
         //directionalLight(255, 255, 255, 0, -1, 0);
-        lights();
+        //lights();
         //pointLight(255, 255, 255, -50, 1000, -50);
         
+        shader(lightTextureShader);
 
-        //shader(lightTextureShader);
-
+        lightTextureShader.set("isSunlit", 0.0f);
         System.out.println("FPS: " + frameRate);
         camera.updateCamera();
         frustum.updateFrustum(camera);
         pyramid.render(frustum);
 
-        /*
-        PShape z = ShapeFactory.py_boxRing(1000, 100, 100);
-        z.rotateX(-PI/2);
-        z.translate(0, 0, 1000);
-        shape(z);
-        */
+
+        lightTextureShader.set("isSunlit", 1.0f);
+        pyEx.render(frustum);
+        shape(sandFloor);
     }
     
     public void keyPressed() {

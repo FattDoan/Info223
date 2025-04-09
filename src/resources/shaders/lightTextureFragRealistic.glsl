@@ -8,6 +8,8 @@ uniform mat4 transform;
 uniform mat3 normalMatrix;
 uniform vec4 lightPosition;
 
+uniform float isSunlit;
+
 uniform sampler2D texture;
 uniform mat4 texMatrix;
 
@@ -24,9 +26,10 @@ void main() {
     vec3 direction = normalize(lightPos - ecPosition);
 
     float distance = length(lightPos - ecPosition);
+    float ambient = 1.0 * isSunlit;
     float attenuation = 1.0 / (1.0 + 0.005 * distance + 0.00005 * distance * distance);
 
-    float intensity = max(0.0, dot(direction, ecNormal)) * attenuation;
+    float intensity = max(ambient, max(0.0, dot(direction, ecNormal)) * attenuation);
 
     vec4 texColor = texture2D(texture, vertTexCoord.st);
     gl_FragColor = vec4(intensity, intensity, intensity, 1.0) * vertColor * texColor;

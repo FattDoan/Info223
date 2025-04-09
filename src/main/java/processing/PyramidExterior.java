@@ -3,6 +3,7 @@ package processing;
 import processing.core.PApplet;
 import processing.core.PShape;
 import processing.core.PVector;
+import processing.core.PMatrix3D;
 import java.util.ArrayList;
 
 class ExteriorWall extends AABB {
@@ -55,6 +56,9 @@ public class PyramidExterior {
         int nbLevels = (cellSize*levelHeight) / 20; // NOTE: celLSize must be divisible by 20 to render properly
         // At each level we decrease both ends by w * w * h (x * y * z)
         int X = -cellSize, Y = -cellSize, Z = 0;
+        //PMatrix3D matrix = new PMatrix3D();
+        //matrix.rotateX(-PApplet.PI/2);
+        //matrix.translate(0 , 0, cellSize * pyramidSize);
         for (int i = 0; i < nbMazes; i++) {
             for (int level = 0; level < nbLevels; level++) {
                 PVector min = new PVector(X, Y, Z);
@@ -66,6 +70,7 @@ public class PyramidExterior {
                 walls.add(wall);
                 System.out.println("Added wall");
                 S.addChild(wall.initShape());
+                //wall.updateWithMatrix(matrix); 
                 System.out.println("Added child");
                 X += w; Y += w; Z += h;
                 l -= 2*w;
@@ -76,9 +81,22 @@ public class PyramidExterior {
         return this.S;
     }
     public void render(Frustum frustum) {
+        int cnt = 0;
         for (ExteriorWall wall : walls) {
             wall.update(frustum);
+            if (wall.isOnFrustum(frustum)) {
+                cnt++;
+            }
         }
+        System.out.println("Number of walls on frustum: " + cnt);
         context.shape(S);
+    }
+    public float[] getBoundLowestLevel() {
+        float[] bounds = new float[4];
+        bounds[0] = walls.get(0).getMin().x;
+        bounds[1] = walls.get(0).getMax().x;
+        bounds[2] = walls.get(0).getMin().y;
+        bounds[3] = walls.get(0).getMax().y;
+        return bounds;
     }
 }

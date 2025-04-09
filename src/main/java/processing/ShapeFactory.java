@@ -8,11 +8,13 @@ public class ShapeFactory {
     private static PApplet context;
     private static PImage textures;
     private static PImage brickTex;
-    
+    private static PImage sandTex;
+
     private static int stones_w, stones_h, stones_x, stones_y;
     private static int floor_w, floor_h, floor_x, floor_y;
     private static int brick_w, brick_h, brick_x, brick_y;
-   
+    private static int sand_w, sand_h, sand_x, sand_y;
+
     private static float zBuffer = 0.1f;    // Avoid z-fighting
 
     public ShapeFactory(PApplet context, PImage textures) {
@@ -34,7 +36,13 @@ public class ShapeFactory {
         brick_x = 0;
         brick_y = 512;
 
+        sand_w = 512;
+        sand_h = 512;
+        sand_x = 1024;
+        sand_y = 0;
+
         brickTex = textures.get(brick_x, brick_y, brick_w, brick_h);
+        sandTex = textures.get(sand_x, sand_y, sand_w, sand_h);
     }
     public static void setRepeat() {
         context.textureMode(PApplet.NORMAL);
@@ -163,16 +171,16 @@ public class ShapeFactory {
         PShape bR = context.createShape(PApplet.GROUP);
   
         PShape s0 = py_1SideBoxRing(l, h, w);
-        PShape s1 = py_1SideBoxRing(l, h + zBuffer, w);
+        PShape s1 = py_1SideBoxRing(l, h, w);
         s1.rotateZ(PApplet.PI/2);
         s1.rotateY(-PApplet.PI/2);
         s1.translate(w*2, 0, h);
         
-        PShape s2 = py_1SideBoxRing(l, h + zBuffer*1.5f, w);
+        PShape s2 = py_1SideBoxRing(l, h, w);
         s2.rotateZ(PApplet.PI/2);
         s2.translate(l, 0, 0);
         
-        PShape s3 = py_1SideBoxRing(l, h + zBuffer*2f, w);
+        PShape s3 = py_1SideBoxRing(l, h, w);
         s3.rotateX(-PApplet.PI/2);
         s3.translate(0, l - 2*w, h);
         bR.addChild(s0);
@@ -186,6 +194,72 @@ public class ShapeFactory {
         //                         y is from front to back (of the camera)
         //                         z is from top to bottom (of the camera)
         return bR;
+    }
+    public static PShape sandFloor(float floorSize) {
+        setRepeat();
+        int cols = 200, rows = 200;
+        float scl = 25;
+        PShape S = context.createShape(PApplet.GROUP);
+
+        for (int x = 0; x < cols - 1; x++) {
+            for (int y = 0; y < rows - 1; y++) {
+                float x0 = PApplet.map(x, 0, cols, -floorSize, floorSize);
+                float y0 = PApplet.map(y, 0, rows, -floorSize, floorSize);
+                float z0 = context.noise(x * 0.1f, y * 0.1f) * scl;
+                
+                float x1 = PApplet.map(x + 1, 0, cols, -floorSize, floorSize);
+                float y1 = PApplet.map(y + 1, 0, rows, -floorSize, floorSize);
+                float z1 = context.noise((x + 1) * 0.1f, y * 0.1f) * scl;
+                float z2 = context.noise((x + 1) * 0.1f, (y + 1) * 0.1f) * scl;
+                float z3 = context.noise(x * 0.1f, (y + 1) * 0.1f) * scl;
+                
+                // Random angle for texture coordinates
+                float angle = context.random(PApplet.TWO_PI);
+                float scale = context.random(0.8f, 1.2f);
+                float[][] texCoords = getRotatedTexCoords(angle, scale);
+
+                PShape s = context.createShape();
+                s.beginShape(PApplet.QUADS);
+                s.texture(sandTex);
+                s.noStroke();
+                /*
+                s.vertex(x0, y0, z0, 0, 0);
+                s.vertex(x1, y0, z1, 1, 0);
+                s.vertex(x1, y1, z2, 1, 1);
+                s.vertex(x0, y1, z3, 0, 1);
+                */
+                s.vertex(x0, y0, z0, texCoords[0][0], texCoords[0][1]);
+                s.vertex(x1, y0, z1, texCoords[1][0], texCoords[1][1]);
+                s.vertex(x1, y1, z2, texCoords[2][0], texCoords[2][1]);
+                s.vertex(x0, y1, z3, texCoords[3][0], texCoords[3][1]);
+                s.endShape();
+
+                S.addChild(s);
+            }
+        }
+        
+        S.rotateX(-PApplet.PI/2);
+        return S;
+    }
+    private static float[][] getRotatedTexCoords(float angle, float scale) {
+        float[][] coords = new float[4][2];
+        
+        // Center point for rotation
+        float cx = 0.5f;
+        float cy = 0.5f;
+        
+        // Original coordinates
+        float[][] orig = {{0, 0}, {1, 0}, {1, 1}, {0, 1}};
+        
+        // Apply rotation and scaling around center
+        for (int i = 0; i < 4; i++) {
+            float dx = (orig[i][0] - cx) * scale;
+            float dy = (orig[i][1] - cy) * scale;
+            
+            coords[i][0] = cx + dx * PApplet.cos(angle) - dy * PApplet.sin(angle);
+            coords[i][1] = cy + dx * PApplet.sin(angle) + dy * PApplet.cos(angle);
+        }    
+        return coords;
     }
 }
 

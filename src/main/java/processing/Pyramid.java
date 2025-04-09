@@ -19,7 +19,6 @@ public class Pyramid {
         this.levelHeight = levelHeight;
         this.context = context;
         this.mazes = new ArrayList<Maze>(); 
-        this.pyEx = new PyramidExterior(context, pyramidSize, cellSize, levelHeight);
         generatePyramid();
         initShape();
     }
@@ -54,15 +53,13 @@ public class Pyramid {
         P = context.createShape(PApplet.GROUP);
         for (Maze maze : mazes) {
             P.addChild(maze.initShape());
-        }
-        pyEx.initShape();
+        } 
     }
     public void render(Frustum frustum) {
        for (Maze maze : mazes) {
            maze.update(frustum);
         }
         context.shape(P);  
-        pyEx.render(frustum); 
     }
 
 }
