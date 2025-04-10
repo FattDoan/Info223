@@ -37,16 +37,10 @@ public class Pyramid {
     public int getNbMazes() {
         return (pyramidSize - 1) / 2;
     }
-    public void generatePyramid() {
-        
+    public void generatePyramid() { 
         int nbMazes = (pyramidSize - 1) / 2;
-        //int nbMazes = 0;
-        boolean flag = false;
-        for (int i = 0; i <= nbMazes; i++) {
-            if (i > nbMazes/2) {
-                flag = true;
-            }
-            mazes.add(new Maze(i, pyramidSize - i * 2, cellSize, levelHeight, context, flag));
+        for (int i = 0; i <= nbMazes/2; i++) {
+            mazes.add(new Maze(i, pyramidSize - i * 2, cellSize, levelHeight, context, false));
         }
     }
     public void initShape() {
@@ -55,10 +49,8 @@ public class Pyramid {
             P.addChild(maze.initShape());
         } 
     }
-    public void render(Frustum frustum) {
-       for (Maze maze : mazes) {
-           maze.update(frustum);
-        }
+
+    public void render() {
         context.shape(P);  
     }
 

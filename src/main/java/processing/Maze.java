@@ -127,20 +127,8 @@ public class Maze extends AABB {
         return M;
     }
 
-    @Override
-    public void update(Frustum frustum) {
-        if (isOnFrustum(frustum)) 
-        {
-            M.setVisible(true);
-            for (int i = 0; i < mazeSize; i++) {
-                for (int j = 0; j < mazeSize; j++) {
-                    cells[i][j].update(frustum);
-                }
-            }
-        }
-        else {
-            M.setVisible(false);
-        }
+    public void render() {
+        context.shape(M);
     }
     public void print() {
         for (int i = 0; i < mazeSize; i++) {
@@ -149,5 +137,8 @@ public class Maze extends AABB {
             }
             System.out.println();
         }
+    }
+    public PShape getShape() {
+        return M;
     }
 }

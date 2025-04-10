@@ -31,18 +31,16 @@ abstract class Cell extends AABB {
     public boolean getSides(int i) { return sides[i]; }
     public void setSides(int i, boolean val) { sides[i] = val; }
     
-    // update based on frustum
-    @Override
-    public void update(Frustum frustum) {
-        if (isOnFrustum(frustum)) S.setVisible(true);
-        else S.setVisible(false);
-    }
     
     // console output for debugging
     public abstract void print();
 
     // draw calls optimization
     public abstract PShape initShapes(PApplet context);
+    
+    public PShape getShape() {
+        return S;
+    }
 
     public boolean isEmpty() {
         return this instanceof EmptyCell;
@@ -67,7 +65,7 @@ class EmptyCell extends Cell {
     @Override
     public PShape initShapes(PApplet context) {
         PShape cellShape = context.createShape(PApplet.GROUP);
-
+        
         float height = maze.getLevelHeight() * maze.getCellSize();
 
         cellShape.translate(getX(), getY(), getZ());

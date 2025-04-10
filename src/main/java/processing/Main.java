@@ -21,11 +21,12 @@ public class Main extends PApplet {
     ShapeFactory sF;
     Pyramid pyramid;
     PyramidExterior pyEx;
-    Frustum frustum;
     CollisionDetector collisionDetector;
     PShader lightShader, lightTextureShader;
 
     PShape sandFloor;
+
+    PShape test;
     private void init() {
         textures = loadImage("src/resources/assets/textures.png");
         //lightTextureShader = loadShader("src/resources/shaders/lightTextureFrag.glsl", "src/resources/shaders/lightTextureVert.glsl");
@@ -44,9 +45,9 @@ public class Main extends PApplet {
 
         collisionDetector = new CollisionDetector(pyramid);
         camera = new Camera(this, startingPos, reader.getMouseSensitivity(), reader.getMoveSpeed(), collisionDetector);
-        frustum = new Frustum(camera); 
     
-        sandFloor = ShapeFactory.sandFloor(1200f);
+        sandFloor = ShapeFactory.sandFloor(1200f, pyEx.getBoundLowestLevel());
+    
     }
 
     public void settings() {
@@ -69,24 +70,18 @@ public class Main extends PApplet {
         init();
     }
         
-    public void draw() {
-        background(240, 255, 255);
-        //lightFalloff(1, 0, 0);
-        //directionalLight(255, 255, 255, 0, -1, 0);
-        //lights();
-        //pointLight(255, 255, 255, -50, 1000, -50);
-        
+    public void draw() { 
+        System.out.println("FPS: " + frameRate);
+        background(203, 195, 227);
         shader(lightTextureShader);
 
         lightTextureShader.set("isSunlit", 0.0f);
-        System.out.println("FPS: " + frameRate);
         camera.updateCamera();
-        frustum.updateFrustum(camera);
-        pyramid.render(frustum);
+        pyramid.render();
 
 
         lightTextureShader.set("isSunlit", 1.0f);
-        pyEx.render(frustum);
+        pyEx.render();
         shape(sandFloor);
     }
     

@@ -3,7 +3,6 @@ package processing;
 import processing.core.PApplet;
 import processing.core.PShape;
 import processing.core.PVector;
-import processing.core.PMatrix3D;
 import java.util.ArrayList;
 
 class ExteriorWall extends AABB {
@@ -18,21 +17,9 @@ class ExteriorWall extends AABB {
         int l = (int) (getMax().x - getMin().x);
         this.S = ShapeFactory.py_boxRing(l, this.h, this.w);
         this.S.translate(getMin().x, getMin().y, getMin().z);
-        System.out.println("Inited wall");
         return this.S;
     }
-    @Override
-    public void update(Frustum frustum) {
-        /*
-        if (isOnFrustum(frustum)) {
-            S.setVisible(true);
-            System.out.println("Wall is on frustum");
-        }
-        else {
-            System.out.println("Wall is not on frustum");
-            S.setVisible(false);
-        }*/
-    }
+
 }
 public class PyramidExterior {
     private PApplet context;
@@ -54,49 +41,33 @@ public class PyramidExterior {
         int h = w * levelHeight;
         int l = cellSize * (pyramidSize + 2);
         int nbLevels = (cellSize*levelHeight) / 20; // NOTE: celLSize must be divisible by 20 to render properly
-        // At each level we decrease both ends by w * w * h (x * y * z)
-        int X = -cellSize, Y = -cellSize, Z = 0;
-        //PMatrix3D matrix = new PMatrix3D();
-        //matrix.rotateX(-PApplet.PI/2);
-        //matrix.translate(0 , 0, cellSize * pyramidSize);
-        for (int i = 0; i < nbMazes; i++) {
+        // At each level we decrease both ends by w * h * w (x * y * z)
+        int X = -cellSize, Y = 0, Z = -cellSize;
+        for (int i = 0; i <= nbMazes; i++) {
             for (int level = 0; level < nbLevels; level++) {
                 PVector min = new PVector(X, Y, Z);
-                PVector max = min.copy().add(l, l, h);
+                PVector max = min.copy().add(l, h, l);
                 System.out.println("Min : " + min.x + " " + min.y + " " + min.z);
                 System.out.println("Max : " + max.x + " " + max.y + " " + max.z);
                 System.out.println("------------------------------------------------");
                 ExteriorWall wall = new ExteriorWall(min, max, h, w);
                 walls.add(wall);
-                System.out.println("Added wall");
                 S.addChild(wall.initShape());
-                //wall.updateWithMatrix(matrix); 
-                System.out.println("Added child");
-                X += w; Y += w; Z += h;
+                X += w; Y += h; Z += w;
                 l -= 2*w;
             }
         }
-        S.rotateX(-PApplet.PI/2);
-        S.translate(0,0, cellSize * pyramidSize);
         return this.S;
     }
-    public void render(Frustum frustum) {
-        int cnt = 0;
-        for (ExteriorWall wall : walls) {
-            wall.update(frustum);
-            if (wall.isOnFrustum(frustum)) {
-                cnt++;
-            }
-        }
-        System.out.println("Number of walls on frustum: " + cnt);
+    public void render() {
         context.shape(S);
     }
     public float[] getBoundLowestLevel() {
         float[] bounds = new float[4];
         bounds[0] = walls.get(0).getMin().x;
         bounds[1] = walls.get(0).getMax().x;
-        bounds[2] = walls.get(0).getMin().y;
-        bounds[3] = walls.get(0).getMax().y;
+        bounds[2] = walls.get(0).getMin().z;
+        bounds[3] = walls.get(0).getMax().z;
         return bounds;
     }
 }

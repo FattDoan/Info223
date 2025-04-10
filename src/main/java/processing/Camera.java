@@ -40,8 +40,8 @@ public class Camera {
         this.theta = this.phi = 0;     // look straight ahead          
         this.cursor = new Cursor(context);
 
-        this.zFar = 1000f;
-        this.zNear = 1f;
+        this.zFar = 2000f;
+        this.zNear = 0.1f;
 
         this.aspect = (float)context.width / context.height;
     }
