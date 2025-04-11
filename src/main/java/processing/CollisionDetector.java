@@ -9,7 +9,7 @@ public class CollisionDetector {
     public CollisionDetector(Pyramid pyramid) {
         this.pyramid = pyramid;
     }
-    public boolean isInPyramid(PVector pos) {
+    public static boolean isInPyramid(Pyramid pyramid, PVector pos) {
         if (pos.y < 0 || pos.y > pyramid.getLevelHeight() * pyramid.getCellSize() * pyramid.getNbMazes()) {
             return false;
         }
@@ -17,7 +17,7 @@ public class CollisionDetector {
         return pyramid.getMaze(mazeLevel).isPointInsideAABB(pos); 
     }
     public boolean isColliding(PVector pos) {
-        if (!isInPyramid(pos)) {
+        if (!CollisionDetector.isInPyramid(this.pyramid, pos)) {
             return false;
         }
         //pseudo AABB box with pos the center

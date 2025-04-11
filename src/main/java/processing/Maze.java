@@ -48,6 +48,9 @@ public class Maze extends AABB {
     public Cell getCell(int i, int j) {
         return cells[i][j];
     }
+    public int getLevel() {
+        return level;
+    }
     public static PVector getCellCoord(int i, int j, int mazeLevel, int cellSize, int levelHeight) {
         return new PVector((j + mazeLevel) * cellSize,
                            mazeLevel * cellSize * levelHeight,
@@ -141,4 +144,5 @@ public class Maze extends AABB {
     public PShape getShape() {
         return M;
     }
+ 
 }

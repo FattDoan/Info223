@@ -25,8 +25,8 @@ public class Main extends PApplet {
     PShader lightShader, lightTextureShader;
 
     PShape sandFloor;
+    HUD hud;
 
-    PShape test;
     private void init() {
         textures = loadImage("src/resources/assets/textures.png");
         //lightTextureShader = loadShader("src/resources/shaders/lightTextureFrag.glsl", "src/resources/shaders/lightTextureVert.glsl");
@@ -39,15 +39,16 @@ public class Main extends PApplet {
         sF = new ShapeFactory(this, textures);
         PVector startingPos = new PVector(reader.getCellSize() + reader.getCellSize()/2, reader.getCellSize(), 0);
         
-        pyramid = new Pyramid(reader.getPyramidSize(), reader.getCellSize(), reader.getLevelHeight(), this);
-        pyEx = new PyramidExterior(this, reader.getPyramidSize(), reader.getCellSize(), reader.getLevelHeight());
-        pyEx.initShape();
-
+        pyramid = new Pyramid(reader.getPyramidSize(), reader.getCellSize(), reader.getLevelHeight(), null, this);
         collisionDetector = new CollisionDetector(pyramid);
         camera = new Camera(this, startingPos, reader.getMouseSensitivity(), reader.getMoveSpeed(), collisionDetector);
-    
+        pyramid.setCam(camera);       // --> avoid dependency circularity
+
+        pyEx = new PyramidExterior(this, reader.getPyramidSize(), reader.getCellSize(), reader.getLevelHeight());
+        pyEx.initShape();
         sandFloor = ShapeFactory.sandFloor(1200f, pyEx.getBoundLowestLevel());
     
+        hud = new HUD(this, pyramid);
     }
 
     public void settings() {
@@ -73,16 +74,20 @@ public class Main extends PApplet {
     public void draw() { 
         System.out.println("FPS: " + frameRate);
         background(203, 195, 227);
+
         shader(lightTextureShader);
-
-        lightTextureShader.set("isSunlit", 0.0f);
+        //lights();
         camera.updateCamera();
+ 
+        lightTextureShader.set("isSunlit", 0.0f);
         pyramid.render();
-
 
         lightTextureShader.set("isSunlit", 1.0f);
         pyEx.render();
         shape(sandFloor);
+        
+        resetShader();
+        hud.render();
     }
     
     public void keyPressed() {

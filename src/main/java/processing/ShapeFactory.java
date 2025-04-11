@@ -143,6 +143,68 @@ public class ShapeFactory {
         s.endShape();    
         return s;
     }
+    public static PShape boxNormal(float w, float h, float d, int r, int g, int b) {
+      PShape box = context.createShape();
+      box.beginShape(PApplet.QUADS);
+        box.fill(r, g, b);
+      // Front face
+      box.vertex(-w/2, -h/2, d/2);
+      box.vertex(w/2, -h/2, d/2);
+      box.vertex(w/2, h/2, d/2);
+      box.vertex(-w/2, h/2, d/2);
+      
+      // Back face
+      box.vertex(-w/2, -h/2, -d/2);
+      box.vertex(w/2, -h/2, -d/2);
+      box.vertex(w/2, h/2, -d/2);
+      box.vertex(-w/2, h/2, -d/2);
+      
+      // Left face
+      box.vertex(-w/2, -h/2, d/2);
+      box.vertex(-w/2, -h/2, -d/2);
+      box.vertex(-w/2, h/2, -d/2);
+      box.vertex(-w/2, h/2, d/2);
+      
+      // Right face
+      box.vertex(w/2, -h/2, d/2);
+      box.vertex(w/2, -h/2, -d/2);
+      box.vertex(w/2, h/2, -d/2);
+      box.vertex(w/2, h/2, d/2);
+      
+      // Top face
+      box.vertex(-w/2, -h/2, d/2);
+      box.vertex(w/2, -h/2, d/2);
+      box.vertex(w/2, -h/2, -d/2);
+      box.vertex(-w/2, -h/2, -d/2);
+      
+      // Bottom face
+      box.vertex(-w/2, h/2, d/2);
+      box.vertex(w/2, h/2, d/2);
+      box.vertex(w/2, h/2, -d/2);
+      box.vertex(-w/2, h/2, -d/2);
+      
+      box.endShape();
+      box.translate(w/2, h/2, d/2);
+
+      
+      return box;
+    }
+    public static PShape floorNormal(float w, float h, float d, int r, int g, int b) {
+      PShape box = context.createShape();
+      box.beginShape(PApplet.QUADS);
+      box.fill(r, g, b);     
+      // Back face
+      box.vertex(-w/2, -h/2, -d/2);
+      box.vertex(w/2, -h/2, -d/2);
+      box.vertex(w/2, h/2, -d/2);
+      box.vertex(-w/2, h/2, -d/2);
+
+      box.endShape();
+      box.translate(w/2, h/2, d/2);
+
+      
+      return box;
+    }    
     // l is along x, w is along z, h is along y
     public static PShape py_box(float l, float h) {
         setRepeat();
@@ -166,6 +228,31 @@ public class ShapeFactory {
         s1.translate(0,h,0);
         S.addChild(s0); 
         S.addChild(s1);
+        return S;
+    }
+    public static PShape py_1SideBoxRingDoor(float l, float h, float w, float doorX, float doorWidth) {
+        PShape S = context.createShape(PApplet.GROUP);
+        
+        PShape s0 = context.createShape(PApplet.GROUP);
+        PShape s0_left = py_box(doorX, h);
+        PShape s0_right = py_box(l - doorX - doorWidth, h);
+        s0_right.translate(doorX + doorWidth, 0, 0);
+        
+        s0.addChild(s0_left);
+        s0.addChild(s0_right);
+
+        PShape s1 = context.createShape(PApplet.GROUP);
+        PShape s1_left = py_box(doorX, w);
+        PShape s1_right = py_box(l - doorX - doorWidth, w);
+        s1_right.translate(doorX + doorWidth, 0, 0);
+        
+        s1.addChild(s1_left);
+        s1.addChild(s1_right);
+
+        s1.rotateX(PApplet.PI/2);
+        s1.translate(0, h, 0);
+
+        S.addChild(s0); S.addChild(s1);
         return S;
     }
     public static PShape py_boxRing(int l, int h, int w) {
@@ -194,21 +281,70 @@ public class ShapeFactory {
         bR.addChild(s2);
         bR.addChild(s3);
        
-
-        // TO FILL THE HOLE FOR THE DOOR is s3
-        // thi is in (x,y,z) where x is from left to right (of the camera)
-        //                         y is from front to back (of the camera)
-        //                         z is from top to bottom (of the camera)
         return bR;
+    }
+    public static PShape py_boxRingWithDoor(int l, int h, int w, float doorX, float doorWidth) {
+        PShape bR = context.createShape(PApplet.GROUP);
+        // top
+        PShape s0 = py_1SideBoxRingDoor(l, h, w, doorX, doorWidth);
+        // right
+        PShape s1 = py_1SideBoxRing(l, h, w);
+        s1.rotateY(-PApplet.PI/2);
+        s1.translate(l, 0, 0);
+        // left
+        PShape s2 = py_1SideBoxRing(l, h, w);
+        s2.rotateY(PApplet.PI/2);
+        s2.translate(0, 0, l);
+        // bottom
+        PShape s3 = py_1SideBoxRing(l, h, w);
+        s3.rotateY(-PApplet.PI);
+        s3.translate(l, 0, l);
+        
+        bR.addChild(s0);
+        bR.addChild(s1);
+        bR.addChild(s2);
+        bR.addChild(s3);
+       
+        return bR;
+    }
+    // dz and w_step are along z axis
+    // ly and h_step are along y axis
+    public static PShape doorSide(int dz, int ly, int h_step, int w_step) {
+        int nbSteps = ly / h_step;
+        PShape S = context.createShape(PApplet.GROUP);
+        for (int i = 0; i < nbSteps; i++) {
+            int l = dz - i * w_step;
+            int h = h_step;
+            PShape s = ShapeFactory.py_box(l, h);
+            s.rotateY(-PApplet.PI/2);
+            s.translate(0, i * h_step, i * w_step);
+            S.addChild(s);
+        }
+        return S;
+    }
+    public static PShape doorSides(int dz, int ly, int h_step, int w_step, float doorX, float doorWidth) {
+        PShape S = context.createShape(PApplet.GROUP);
+        PShape s0 = doorSide(dz, ly, h_step, w_step);
+        s0.translate(doorX, 0, 0);
+        PShape s1 = doorSide(dz, ly, h_step, w_step);
+        s1.translate(doorX + doorWidth, 0, 0);
+
+        S.addChild(s0);
+        S.addChild(s1);
+
+        S.translate(0, 0, -dz);
+        return S;
     }
     public static PShape sandFloor(float floorSize, float[] pyExBounds) {
         setRepeat();
+        context.noiseSeed(69);
         int cols = 100, rows = 100;
+        float r = 0.5f;     // roughness
         float scl = 20;
         PShape S = context.createShape(PApplet.GROUP);
        
-        pyExBounds[0] += 45;
-        pyExBounds[2] += 45;
+        pyExBounds[0] += 42;
+        pyExBounds[2] += 42;
         for (int i = 0; i < cols - 1; i++) {
             for (int j = 0; j < rows - 1; j++) {
                 float x0 = PApplet.map(i, 0, cols, -floorSize, floorSize);
@@ -222,10 +358,10 @@ public class ShapeFactory {
                     continue;
                 }
 
-                float y0 = context.noise(i * 0.5f, j * 0.5f) * scl;
-                float y1 = context.noise((i + 1) * 0.5f, j * 0.5f) * scl;
-                float y2 = context.noise((i + 1) * 0.5f, (j + 1) * 0.5f) * scl;
-                float y3 = context.noise(i * 0.5f, (j + 1) * 0.5f) * scl;
+                float y0 = context.noise(i * r, j * r) * scl;
+                float y1 = context.noise((i + 1) * r, j * r) * scl;
+                float y2 = context.noise((i + 1) * r, (j + 1) * r) * scl;
+                float y3 = context.noise(i * r, (j + 1) * r) * scl;
                 
                 // Random angle for texture coordinates
                 float angle = context.random(PApplet.TWO_PI);

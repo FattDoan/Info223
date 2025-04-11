@@ -150,5 +150,5 @@ public class Camera {
                 this.pos.add(moveDir);
             }
         }
-    } 
+    }
 }

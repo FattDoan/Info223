@@ -21,7 +21,8 @@ abstract class Cell extends AABB {
         super(coord.copy(), coord.copy().add(new PVector(maze.getCellSize(), maze.getLevelHeight() * maze.getCellSize(), maze.getCellSize())));
         this.coord = coord.copy();
         this.maze = maze;
-        this.sides = new boolean[]{false, false, false, false};
+        this.sides = new boolean[]{false, false, false, false, false};
+        // sides[4] is wether or not we have discorvered the cell
     }
     public float getX() { return this.coord.x; }
     public float getY() { return this.coord.y; }
@@ -31,7 +32,12 @@ abstract class Cell extends AABB {
     public boolean getSides(int i) { return sides[i]; }
     public void setSides(int i, boolean val) { sides[i] = val; }
     
-    
+    public boolean isDiscovered() {
+        return sides[4];
+    } 
+    public void setDiscovered(boolean val) {
+        sides[4] = val;
+    }
     // console output for debugging
     public abstract void print();
 
@@ -128,7 +134,6 @@ class WallCell extends Cell {
         PShape cellShape = context.createShape(PApplet.GROUP);
                 
         cellShape.translate(getX(), getY(), getZ());
-        
         // top
         if (i == 0 || !maze.getCell(i-1,j).isWall()) {
             PShape s = ShapeFactory.square0(getSize(), height);
@@ -167,6 +172,8 @@ class WallCell extends Cell {
         s.translate(0, getSize() * (maze.getLevelHeight() - 1), 0);
 
         cellShape.addChild(s);
+
+        cellShape.setTint(context.color(i*25, j*25, 255-i*10+j*10)); 
         return this.S = cellShape;
     }
 
