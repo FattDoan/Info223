@@ -16,9 +16,7 @@ public class Cursor {
     private PVector previousMovement = new PVector(0, 0);
     private final float dampingFactor = 0.6f; // Higher values = less damping
     private boolean isFirstUpdate = true; 
-     
-    private float deltaTime;
-    
+      
     public Cursor(PApplet context) {
         this.context = context;
 
@@ -46,7 +44,6 @@ public class Cursor {
             return;
         }
         
-        deltaTime = 1.0f / context.frameRate; // Avoid division by zero if FPS drops too low
         float deadZone = PApplet.map(context.frameRate, 0f, 240f, 1.2f, 0.05f);
         
         // Apply a dead zone to filter out tiny movements

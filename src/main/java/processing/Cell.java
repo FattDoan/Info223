@@ -190,8 +190,29 @@ class StartCell extends PathCell {
     
     @Override
     public PShape initShapes(PApplet context) {
-        super.initShapes(context);
-        this.S.fill(0, 255, 0);
+        S = context.createShape(PApplet.GROUP);
+        S.translate(getX(), getY(), getZ());
+
+        // add floor
+        PShape s4 = ShapeFactory.square4(getSize(), getSize());
+        if (maze.getLevel() > 0) {
+            s4.setTint(context.color(0, 192, 0));
+        } 
+        S.addChild(s4);
+
+        // add roof
+        PShape s5 = ShapeFactory.square5(getSize(), getSize());
+        s5.translate(0, getSize() * (maze.getLevelHeight() - 1), 0);
+        S.addChild(s5);
+
+        PVector idx = Maze.getCellIndex(coord, maze.getCellSize(), maze.getLevelHeight()).copy();
+        int i = (int)idx.x, j = (int)idx.y;
+        float height = maze.getLevelHeight() * maze.getCellSize();
+        PShape s = ShapeFactory.square1(getSize(), height);
+        s.translate(0, 0, -maze.getCellSize());
+        s.setTint(context.color(i*25, j*25, 255-i*10+j*10));  
+        this.S.addChild(s);
+
         return this.S;
     }
     @Override
@@ -207,8 +228,28 @@ class EndCell extends PathCell {
     
     @Override
     public PShape initShapes(PApplet context) {
-        super.initShapes(context);
-        this.S.fill(0, 255, 0);
+        //super.initShapes(context);
+        S = context.createShape(PApplet.GROUP);
+        S.translate(getX(), getY(), getZ());
+
+        // add floor
+        PShape s4 = ShapeFactory.square4(getSize(), getSize());
+        s4.setTint(context.color(0, 192, 0));
+        S.addChild(s4);
+
+        // add roof
+        PShape s5 = ShapeFactory.square5(getSize(), getSize());
+        s5.translate(0, getSize() * (maze.getLevelHeight() - 1), 0);
+        S.addChild(s5);
+ 
+
+        PVector idx = Maze.getCellIndex(coord, maze.getCellSize(), maze.getLevelHeight()).copy();
+        int i = (int)idx.x, j = (int)idx.y;
+        float height = maze.getLevelHeight() * maze.getCellSize();
+        PShape s = ShapeFactory.square2(getSize(), height);
+        s.translate(maze.getCellSize(), 0, 0);
+        s.setTint(context.color(i*25, j*25, 255-i*10+j*10));
+        this.S.addChild(s);
         return this.S;
     }
     @Override

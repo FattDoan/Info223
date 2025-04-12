@@ -3,7 +3,6 @@ package processing;
 import processing.core.PApplet;
 import processing.core.PShape;
 import processing.core.PVector;
-import java.util.ArrayList;
 
 public class HUD {
     private PApplet context;
@@ -14,35 +13,43 @@ public class HUD {
         this.pyramid = pyramid;
         //   initShape();
     }
-    /*
-    private void initMap() {
-        int n = pyramid.getNbMazes();
-        for (int level = 0; level < n; level++) {
-            System.out.println("Level " + level);
-            Maze m = pyramid.getMaze(level);
-            PShape s = context.createShape(PApplet.GROUP);
-            System.out.println("Initializing maze " + level);
-            for (int i = 0; i < m.getMazeSize(); i++) {
-                for (int j = 0; j < m.getMazeSize(); j++) {
-                    System.out.println("Checking...");
-                    if (m.getCell(i, j).isWall()) {
-                        PShape cell = ShapeFactory.boxNormal(10f,10f,10f,i*25,j*25,255-i*10+j*10);
-                        PVector coord = Maze.getCellCoord(i, j, level, 10, m.getLevelHeight());
-                        cell.translate(coord.x, coord.z, 0);
-                        s.addChild(cell); 
-                    }
-                }
-            }
-            System.out.println("Finish maze " + level);
-            s.translate(50, 50, 0);
-            Map.add(s);
-            System.out.println("Added maze");
-        }
-    }*/
-    /*
-    public void initShape() {
-        initMap();
-    }*/
+
+    private PShape createFOVCone(PVector position, PVector direction, float fovAngle, float coneLength) {
+        PShape cone = context.createShape();
+        
+        // Calculate 2D direction (we only care about x and z for top-down map)
+        PVector dir2D = new PVector(direction.x, direction.z);
+        dir2D.normalize();
+        
+        // Calculate the angle of the direction vector
+        float directionAngle = PApplet.atan2(dir2D.y, dir2D.x);
+        
+        float halfFOV = fovAngle / 2;
+        float leftAngle = directionAngle - halfFOV;
+        float rightAngle = directionAngle + halfFOV;
+        
+        PVector leftPoint = new PVector(
+            position.x + coneLength * PApplet.cos(leftAngle),
+            position.z + coneLength * PApplet.sin(leftAngle)
+        );
+        
+        PVector rightPoint = new PVector(
+            position.x + coneLength * PApplet.cos(rightAngle),
+            position.z + coneLength * PApplet.sin(rightAngle)
+        );
+        
+
+        cone.beginShape();
+        cone.fill(255, 255, 0, 80); 
+        cone.noStroke();
+        cone.vertex(position.x, position.z);
+        cone.vertex(leftPoint.x, leftPoint.y);
+        cone.vertex(rightPoint.x, rightPoint.y);
+        cone.endShape(PApplet.CLOSE);
+        
+        return cone;
+    }
+    // A lot of hard-coded values in here
     public void drawMap(Maze m) {
         PShape M = context.createShape(PApplet.GROUP);
         for (int i = 0; i < m.getMazeSize(); i++) {
@@ -62,32 +69,46 @@ public class HUD {
                 }
             }
         }
+    
         PVector camPos = pyramid.getCamPos();
+        camPos.x = camPos.x * 10/m.getCellSize();
+        camPos.z = camPos.z * 10/m.getCellSize();
+        PShape player = context.createShape(PApplet.SPHERE, 4);
+        player.setFill(context.color(0, 255, 0));
+        player.translate(camPos.x, camPos.z, 0);
+        player.setStroke(false);
+        M.addChild(player);
 
-        PShape s = context.createShape(PApplet.SPHERE, 6);
-        s.setFill(context.color(255, 0, 0));
-        s.translate(camPos.x, camPos.z, 0);
-        M.addChild(s);
-        M.translate(25, 25, 0);
+        PShape fovCone = createFOVCone(camPos, pyramid.getCam().getForwardVect(), pyramid.getCam().fovY, 45);
+        fovCone.translate(4, 4, 12);
+        M.addChild(fovCone);
+    
+
+        M.translate(10, 40, 0);
         M.rotateY(PApplet.PI/12);
+        M.rotateZ(-PApplet.PI/80);
         context.shape(M);
     }
+
     public void render() {
-        //context.hint(PApplet.DISABLE_DEPTH_TEST);
-        context.perspective();
+        context.pushMatrix();
+         
+        context.perspective(); 
         context.noLights();
-        context.camera(context.width/2.f, context.height/2.f, 
-                (context.height/2.f) / PApplet.tan(PApplet.PI*30.f / 180.f), 
-                context.width/2.f, context.height/2.f, 0, 0, 1, 0);
+        
+        context.camera(context.width/2, context.height/2, 
+                (context.height/2) / PApplet.tan(PApplet.PI*30.f / 180.f), 
+                context.width/2, context.height/2, 0, 0, 1, 0);
         
         int i = pyramid.getCurrentPlayerLevel();
+        String s = "Outside";
         if (i != -1) {
             context.stroke(0);
-            System.out.println("Drawing hud");
-            //context.shape(Map.get(i));
+            s = "Level " + i;
             drawMap(pyramid.getMaze(i));
         }
-        //context.hint(PApplet.ENABLE_DEPTH_TEST);
-    }
- 
+        context.textSize(24);
+        context.text(s, 10, 5, 100, 100);
+        context.popMatrix();
+    } 
 }

@@ -11,7 +11,6 @@ public class Pyramid {
     private int pyramidSize;            // pyramid size is the size of the maze of the bottom level
     private int cellSize;
     private int levelHeight;
-    private PShape P;
     private Camera cam;                 // mainly to get cam pos
 
     public Pyramid(int pyramidSize, int cellSize, int levelHeight, Camera cam, PApplet context) {
@@ -22,7 +21,6 @@ public class Pyramid {
         this.mazes = new ArrayList<Maze>(); 
         this.cam = cam;
         generatePyramid();
-        initShape();
     }
     public void setCam(Camera cam) {
         this.cam = cam;
@@ -48,12 +46,6 @@ public class Pyramid {
             mazes.add(new Maze(i, pyramidSize - i * 2, cellSize, levelHeight, context, false));
         }
     }
-    public void initShape() {
-        P = context.createShape(PApplet.GROUP);
-        for (Maze maze : mazes) {
-            P.addChild(maze.initShape());
-        } 
-    }
 
     public void render() {
         // update discorved cells
@@ -74,14 +66,23 @@ public class Pyramid {
                         }
                     }
                 }
-            } 
+            }
+            changeLevel();
+            level = getCurrentPlayerLevel();
+            mazes.get(level).render();
         }
-        // render
-        context.shape(P);  
+        else {
+            mazes.get(0).render();
+        }
     }
 
     public PVector getCamPos() {
         return cam.getPos().copy();
+    }
+    
+    // OOP War-crime
+    public Camera getCam() {
+        return cam;
     }
     public int getCurrentPlayerLevel() {
         if (!CollisionDetector.isInPyramid(this, cam.getPos())) {
@@ -101,5 +102,33 @@ public class Pyramid {
             int i = (int)cellIndex.z;
             return mazes.get(i);
         }
+    }
+    public void changeLevel() {
+        if (!CollisionDetector.isInPyramid(this, cam.getPos())) {
+            return;  
+        }
+        PVector cellIndex = Maze.getCellIndex(cam.getPos(), cellSize, levelHeight);
+        int i = (int)cellIndex.x, j = (int)cellIndex.y, level = (int)cellIndex.z;
+        Maze m = mazes.get(level);
+        // start (0,1)
+        // end (mS - 2, mS - 1)
+        if (i == m.getMazeSize()-2 && j == m.getMazeSize()-1 && level < mazes.size() - 2) {
+            // Go to the start of the next maze
+            PVector nextMazeStartIndex = (mazes.get(level+1)).getNeighBourCellIndex(0, 1, false);
+            PVector nextMazeStart = Maze.getCellCoord((int)nextMazeStartIndex.x, (int)nextMazeStartIndex.y, level + 1, cellSize, levelHeight);
+            nextMazeStart.add(cellSize/2, cellSize, cellSize/2);
+            cam.resetCam(nextMazeStart, nextMazeStart.add(0, 0, cam.lookDistance));
+            return;
+        }
+        if (level > 0 && i == 0 && j == 1) {
+            // Go to the end of the previous maze
+            Maze prevMaze = mazes.get(level - 1);
+            PVector prevMazeEndIndex = prevMaze.getNeighBourCellIndex(prevMaze.getMazeSize() - 2, prevMaze.getMazeSize() - 1, false);            
+            PVector prevMazeEnd = Maze.getCellCoord((int)prevMazeEndIndex.x, (int)prevMazeEndIndex.y, level - 1, cellSize, levelHeight);
+            prevMazeEnd.add(cellSize/2, cellSize, cellSize/2);
+            cam.resetCam(prevMazeEnd, prevMazeEnd.add(0, 0, -cam.lookDistance));
+            return;
+        }
+        
     }
 }

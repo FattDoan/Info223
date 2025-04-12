@@ -3,6 +3,7 @@ package processing;
 import processing.core.PVector;
 import processing.core.PApplet;
 import processing.core.PShape;
+import java.util.ArrayList;
 
 public class Maze extends AABB {
     private PApplet context;
@@ -12,6 +13,8 @@ public class Maze extends AABB {
     private final int level;
     private final int levelHeight;
     private PShape M;
+    private final int[] dx = {0, 1, 0, -1};
+    private final int[] dy = {-1, 0, 1, 0};
     // level starting from 0 -> (PYRAMID_SIZE - 1)/2 -1 max
     public Maze(int level, int mazeSize, int cellSize, int levelHeight, PApplet context, boolean letEmpty) {
         super(new PVector(level * cellSize, level * levelHeight * cellSize, level * cellSize), 
@@ -22,7 +25,7 @@ public class Maze extends AABB {
         this.cellSize = cellSize;
         this.levelHeight = levelHeight;
 
-        cells = new Cell[mazeSize][mazeSize];
+        cells = new Cell[mazeSize + 1][mazeSize + 1];
         if (!letEmpty) {
             mazeGenerationDefault();
             cellsSideCalculate();
@@ -94,7 +97,10 @@ public class Maze extends AABB {
             }
         }
 
-        cells[0][1] = new StartCell(getCellCoord(0, 1, level, cellSize, levelHeight), this);// entree
+        if (level > 0) {
+            cells[0][1] = new StartCell(getCellCoord(0, 1, level, cellSize, levelHeight), this);
+        }
+        else cells[0][1] = new PathCell(getCellCoord(0, 1, level, cellSize, levelHeight), this);
         cells[mazeSize - 2][mazeSize - 1] = new EndCell(getCellCoord(mazeSize - 2, mazeSize - 1, level, cellSize, levelHeight), this); // sortie
     
     }
@@ -144,5 +150,26 @@ public class Maze extends AABB {
     public PShape getShape() {
         return M;
     }
- 
+    private boolean validIndex(int i, int j) {
+        return (i >= 0 && i < mazeSize && j >= 0 && j < mazeSize);
+    }
+    public PVector getNeighBourCellIndex(int i, int j, boolean random) {
+        int r = 0;
+        if (random) {
+            r = (int) Math.random() * 4;
+        }
+        ArrayList<PVector> c = new ArrayList<PVector>();
+        for (int k = 0; k < 4; k++) {
+            int ni = i + dx[k];
+            int nj = j + dy[k];
+            if (validIndex(ni,nj) && cells[ni][nj].isPath()) {
+                c.add(new PVector(ni, nj));
+                if (!random) {
+                    return new PVector(ni, nj);
+                }
+            }
+
+        }
+        return c.get(r);
+    } 
 }

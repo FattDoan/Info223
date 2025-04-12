@@ -20,7 +20,7 @@ public class Camera {
     private PVector rightVect = new PVector(1, 0, 0); // for X movement
     private PVector upVect = new PVector(0, 1, 0); // for Y movement 
     
-    private final float lookDistance = 4;
+    public final float lookDistance = 4;
     public final float fovY = PApplet.PI/3f;
     public final float aspect;    
     public final float zNear;
@@ -47,6 +47,20 @@ public class Camera {
     }
     public PVector getPos() {
         return this.pos.copy();
+    }
+    public void setPos(PVector pos) {
+        this.pos.set(pos.x, pos.y, pos.z);
+    }
+    public void setTarget(PVector target) {
+        this.target.set(target.x, target.y, target.z);
+    }
+    public void resetCam(PVector pos, PVector target) {
+        setPos(pos);
+        setTarget(target);
+        forwardVect = new PVector(0, 0, 1);                                                   
+        rightVect = new PVector(1, 0, 0); 
+        upVect = new PVector(0, 1, 0);  
+        this.theta = this.phi = 0;     
     }
     public void setSensitivity(float sensitivity) {
         this.sensitivity = sensitivity;

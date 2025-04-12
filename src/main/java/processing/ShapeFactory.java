@@ -15,8 +15,6 @@ public class ShapeFactory {
     private static int brick_w, brick_h, brick_x, brick_y;
     private static int sand_w, sand_h, sand_x, sand_y;
 
-    private static float zBuffer = 0.1f;    // Avoid z-fighting
-
     public ShapeFactory(PApplet context, PImage textures) {
         ShapeFactory.context = context;
         ShapeFactory.textures = textures;
@@ -382,7 +380,7 @@ public class ShapeFactory {
                 S.addChild(s);
             }
         }
-        S.translate(0,-8,0);
+        S.translate(0,-10,0);
         return S;
     }
     private static float[][] getRotatedTexCoords(float angle, float scale) {
@@ -404,6 +402,24 @@ public class ShapeFactory {
             coords[i][1] = cy + dx * PApplet.sin(angle) + dy * PApplet.cos(angle);
         }    
         return coords;
+    }
+    public static PShape circle(float radius, int detail, int r, int g, int b) {
+        PShape circle = context.createShape();
+        circle.beginShape();
+        circle.noStroke();
+        circle.fill(r, g, b);
+
+        float angleStep = PApplet.TWO_PI / detail;
+
+        for (int i = 0; i <= detail; i++) {
+            float angle = i * angleStep;
+            float x = PApplet.cos(angle) * radius;
+            float y = PApplet.sin(angle) * radius;
+            circle.vertex(x, y);
+        }
+
+        circle.endShape(PApplet.CLOSE);
+        return circle;
     }
 }
 

@@ -8,9 +8,6 @@ import processing.core.PShape;
 
 public class Main extends PApplet {
     public static void main(String[] args) {
-        //String[] processingArgs = {"Main"};
-        //Main mySketch = new Main();
-        //PApplet.runSketch(processingArgs, mySketch);
         PApplet.main("processing.Main");
     }
 
@@ -37,7 +34,7 @@ public class Main extends PApplet {
         writer.setPyramidSize(21);
         // dependency injection
         sF = new ShapeFactory(this, textures);
-        PVector startingPos = new PVector(reader.getCellSize() + reader.getCellSize()/2, reader.getCellSize(), 0);
+        PVector startingPos = new PVector(-100, reader.getCellSize(), -100);
         
         pyramid = new Pyramid(reader.getPyramidSize(), reader.getCellSize(), reader.getLevelHeight(), null, this);
         collisionDetector = new CollisionDetector(pyramid);
@@ -74,10 +71,12 @@ public class Main extends PApplet {
     public void draw() { 
         System.out.println("FPS: " + frameRate);
         background(203, 195, 227);
-
-        shader(lightTextureShader);
-        //lights();
+        pushMatrix();
         camera.updateCamera();
+
+        
+        shader(lightTextureShader);
+        //lights(); 
  
         lightTextureShader.set("isSunlit", 0.0f);
         pyramid.render();
@@ -86,6 +85,7 @@ public class Main extends PApplet {
         pyEx.render();
         shape(sandFloor);
         
+        popMatrix();
         resetShader();
         hud.render();
     }

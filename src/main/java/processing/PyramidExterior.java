@@ -72,7 +72,6 @@ public class PyramidExterior {
             }
         }
         // Add the door
-        System.out.println("h = " + h + ", w = " + w);
         PShape s = ShapeFactory.doorSides(40, 2 * 40, h, w, doorStartingX, doorWidth);
         S.addChild(s);
         return this.S;
