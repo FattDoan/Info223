@@ -1,26 +1,18 @@
 # Momies et Pyramides
 
-> Ce README n'est pas un rapport. Il sert simplement de note de synthèse pour le développement mais il sera la partie principale du rapport qui sera au format **PDF** en français.
+> Ce README n'est pas un rapport. Ceci sert uniquement d'instructions sur la façon d'exécuter le projet. Pour le rapport du projet, veuillez trouver le fichier RAPPORT.pdf dans le repo.
+
+Il existe deux manières d'exécuter le projet : fichier exécutable .jar ou compilation à partir de la source
 
 ## Implemented features
 
-- **Draw calls optimization**: no more seperate vertices draw (i.e batch all the vertices into shapes and send to the GPU all together)
-
-- **Frustum culling**: combined with predefined PShape from draw calls optimization -> lightning fast performances (achieving 250+ fps even with Fragment Shading on 1080p)
+* **3D Camera system**
+- **Draw calls optimization**: no more seperate vertices draw (i.e batch all the vertices into shapes (PShape) and send to the GPU all together)
 
 - **Texture, Lighting and Shaders**: implement both Vertex Shading and Fragment Shading (prefer Fragment Shading for more realistic lighting)
 
 - **Near O(1) collision detection**: thanks to static environment
-
-### TODO
-
-- [ ] Touching up the pyramid appearance (texture for floor, roof and the outside)
-
-- [ ] Add map and compass
-
-- [ ] Add sun lighting and dessert vibe outside pyramid
-
-- [ ] Add NPC
+* **HUD map** 
 
 ## Build system
 
@@ -44,7 +36,15 @@ Reference: [Maven - JogampWiki](https://jogamp.org/wiki/index.php?title=Maven)
 
 2. This build only (supposedly) works on **Linux**. Different platforms require different dependencies ([Reference]([Downloading and installing JOGL - JogampWiki](https://jogamp.org/wiki/index.php/Downloading_and_installing_JOGL))) and I have just only tested building on linux-amd64. Obtaining platform independent build requires a tad more efforts in tweaking Maven configuration which is not our priority.
 
-## Compile and run
+## Run
+
+Execute .jar file:
+
+```bash
+java -jar Info223.jar
+```
+
+## Compile from source (if the above failed)
 
 > **Make sure Maven installed on your system before**
 
@@ -65,3 +65,11 @@ Then run
 ```bash
 mvn exec:java
 ```
+
+We can also package into jar file
+
+```bash
+mvn clean package
+```
+
+The new .jar file is located inside target folder
