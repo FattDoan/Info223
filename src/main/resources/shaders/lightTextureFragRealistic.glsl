@@ -9,6 +9,8 @@ uniform mat3 normalMatrix;
 uniform vec4 lightPosition;
 
 uniform float isSunlit;
+uniform float hasTexture;
+
 
 uniform sampler2D texture;
 uniform mat4 texMatrix;
@@ -38,8 +40,14 @@ void main() {
 
     float intensity = max(ambient, max(0.0, dot(direction, ecNormal)) * attenuation);
     if (isSunlit < 1.0) {
-        intensity = acceleratePow(intensity, 1.6);
+        intensity = acceleratePow(intensity, 1.5);
     }
-    vec4 texColor = texture2D(texture, vertTexCoord.st);
-    gl_FragColor = vec4(intensity, intensity, intensity, 1.0) * vertColor * texColor;
+
+    vec4 color = vec4(intensity, intensity, intensity, 1.0) * vertColor;
+    if (hasTexture > 0.5) {
+        vec4 texColor = texture2D(texture, vertTexCoord.st);
+        gl_FragColor = color * texColor;
+    } else {
+        gl_FragColor = color; 
+    }
 }

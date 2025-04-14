@@ -54,9 +54,6 @@ public class PyramidExterior {
             for (int level = 0; level < nbLevels; level++) {
                 PVector min = new PVector(X, Y, Z);
                 PVector max = min.copy().add(l, h, l);
-                System.out.println("Min : " + min.x + " " + min.y + " " + min.z);
-                System.out.println("Max : " + max.x + " " + max.y + " " + max.z);
-                System.out.println("------------------------------------------------");
                 ExteriorWall wall = new ExteriorWall(min, max, h, w);
                 walls.add(wall);
                 PShape s;

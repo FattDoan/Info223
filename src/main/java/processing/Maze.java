@@ -137,7 +137,7 @@ public class Maze extends AABB {
     }
 
     public void render() {
-        context.shape(M);
+        context.shape(M); 
     }
     public void print() {
         for (int i = 0; i < mazeSize; i++) {

@@ -392,7 +392,6 @@ public class ShapeFactory {
         
         // Original coordinates
         float[][] orig = {{0, 0}, {1, 0}, {1, 1}, {0, 1}};
-        
         // Apply rotation and scaling around center
         for (int i = 0; i < 4; i++) {
             float dx = (orig[i][0] - cx) * scale;

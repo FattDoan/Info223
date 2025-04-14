@@ -10,7 +10,7 @@ import processing.core.PShape;
 
 
 abstract class Cell extends AABB {
-    protected final PVector coord;
+    protected final PVector coord;     // (x,y,z) coord and not index coord
     protected final Maze maze;        // reference to the maze
                                      // with this dont need to store the size of cell in Cell class
     protected boolean sides[];
@@ -29,7 +29,7 @@ abstract class Cell extends AABB {
     public float getZ() { return this.coord.z; }
     public PVector getCoord() { return coord; }
     public float getSize() { return maze.getCellSize(); }
-    public boolean getSides(int i) { return sides[i]; }
+    public boolean getSide(int i) { return sides[i]; }
     public void setSides(int i, boolean val) { sides[i] = val; }
     
     public boolean isDiscovered() {

@@ -44,11 +44,11 @@ public class Cursor {
             return;
         }
         
-        float deadZone = PApplet.map(context.frameRate, 0f, 240f, 1.2f, 0.05f);
-        
         // Apply a dead zone to filter out tiny movements
+        float deadZone = PApplet.map(context.frameRate, 0f, 240f, 1.2f, 0.05f);
         if (Math.abs(currentMovement.x) < deadZone) currentMovement.x = 0;
         if (Math.abs(currentMovement.y) < deadZone) currentMovement.y = 0;  
+        
         // Blend previous and current movement with less weight on previous
         PVector blendedMovement = new PVector(
             currentMovement.x * 0.8f + previousMovement.x * 0.2f,
